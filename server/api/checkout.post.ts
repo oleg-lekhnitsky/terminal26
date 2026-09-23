@@ -1,3 +1,4 @@
+import { stripeFailure } from '../utils/stripeFailure'
 import { checkoutParameters } from '../utils/fontCheckout'
 import { stripeKeyProblem } from '../utils/stripeKey'
 
@@ -23,5 +24,8 @@ export default defineEventHandler(async event => {
     if (!session.url?.startsWith('https://checkout.stripe.com/')) throw new Error('Missing checkout URL')
     setCookie(event, 'font-checkout-session', session.id, { httpOnly: true, secure: origin.startsWith('https:'), sameSite: 'lax', path: '/', maxAge: 180 * 86400 })
     return { url: session.url }
-  } catch { throw createError({ statusCode: 502, statusMessage: 'Could not open checkout. Please try again.' }) }
+  } catch (error) {
+    console.error('[checkout] Stripe session creation failed', stripeFailure(error))
+    throw createError({ statusCode: 502, statusMessage: 'Could not open checkout. Please try again.' })
+  }
 })

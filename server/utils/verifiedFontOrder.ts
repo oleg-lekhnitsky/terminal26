@@ -1,3 +1,4 @@
+import { stripeFailure } from './stripeFailure'
 import type { H3Event } from 'h3'
 import { stripeKeyProblem } from './stripeKey'
 import { purchasedFonts, verifyDownloadToken, type PaidSession } from './fontDelivery'
@@ -22,7 +23,10 @@ export async function verifiedFontOrder(event: H3Event) {
     session = await $fetch<PaidSession>(`https://api.stripe.com/v1/checkout/sessions/${id}`, {
       headers: { Authorization: `Bearer ${secretKey}` }, timeout: 10000, retry: 0,
     })
-  } catch { throw createError({ statusCode: 502, statusMessage: 'Could not verify payment. Please try again.' }) }
+  } catch (error) {
+    console.error('[checkout] Stripe payment verification failed', stripeFailure(error))
+    throw createError({ statusCode: 502, statusMessage: 'Could not verify payment. Please try again.' })
+  }
   let products
   try { products = purchasedFonts(session) }
   catch { throw createError({ statusCode: 409, statusMessage: 'The order does not match the font catalog.' }) }
