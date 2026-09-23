@@ -1,0 +1,19 @@
+@use 'sass:map';
+
+// Sass values are required here: CSS custom properties cannot drive media queries.
+$breakpoints: (
+  sm: 40rem,
+  md: 48rem,
+  lg: 64rem,
+  xl: 80rem,
+);
+
+@mixin up($breakpoint) {
+  @if not map.has-key($breakpoints, $breakpoint) {
+    @error 'Unknown breakpoint: #{$breakpoint}. Use sm, md, lg, or xl.';
+  }
+
+  @media (min-width: map.get($breakpoints, $breakpoint)) {
+    @content;
+  }
+}

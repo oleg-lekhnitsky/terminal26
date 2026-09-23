@@ -1,0 +1,85 @@
+.button {
+  --button-background: var(--color-primary);
+  --button-hover: var(--color-primary-hover);
+  --button-active: var(--color-primary-active);
+  --button-color: var(--color-on-primary);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: var(--control-height-md);
+  min-inline-size: var(--control-height-md);
+  max-inline-size: 100%;
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--button-background);
+  color: var(--button-color);
+  font: inherit;
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-normal);
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) { background: var(--button-hover); }
+  }
+
+  &:active:not(:disabled) { background: var(--button-active); }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--secondary {
+    --button-background: var(--color-surface);
+    --button-hover: var(--color-surface-muted);
+    --button-active: var(--color-neutral-200);
+    --button-color: var(--color-text);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &--ghost {
+    --button-background: transparent;
+    --button-hover: var(--color-surface-muted);
+    --button-active: var(--color-neutral-200);
+    --button-color: var(--color-text);
+  }
+
+  &--sm {
+    min-block-size: var(--control-height-sm);
+    min-inline-size: var(--control-height-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  &--lg {
+    min-block-size: var(--control-height-lg);
+    min-inline-size: var(--control-height-lg);
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-lg);
+  }
+
+  &--block { inline-size: 100%; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: background-color var(--duration-fast) var(--ease-out),
+      scale var(--duration-fast) var(--ease-out);
+
+    &:active:not(:disabled):not(.button--static) { scale: 0.96; }
+  }
+
+  @media (forced-colors: active) {
+    border-color: ButtonText;
+
+    &:disabled {
+      color: GrayText;
+      border-color: GrayText;
+      opacity: 1;
+    }
+  }
+}

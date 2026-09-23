@@ -1,0 +1,7 @@
+// Load once through nuxt.config.ts. Components consume the CSS custom properties.
+@use 'fonts';
+@use 'tokens';
+@use 'base';
+@use 'typography';
+@use 'layout';
+@use 'buttons';
