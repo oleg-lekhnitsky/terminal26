@@ -100,9 +100,13 @@ onBeforeUnmount(() => { disposed = true; stop(); observer?.disconnect(); documen
       </div>
       <div class="radio-pin__tuning">
         <label class="sr-only" for="terminal-radio-station">Radio station</label>
-        <select v-if="stations.length" id="terminal-radio-station" :value="index" @change="choose">
-          <option v-for="(item, i) in stations" :key="item.id" :value="i">{{ item.name }} · {{ item.country }}</option>
-        </select>
+        <div v-if="stations.length" class="radio-pin__station">
+          <span aria-hidden="true">{{ station?.name }} · {{ station?.country }}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          <select id="terminal-radio-station" :value="index" @change="choose">
+            <option v-for="(item, i) in stations" :key="item.id" :value="i">{{ item.name }} · {{ item.country }}</option>
+          </select>
+        </div>
         <span v-else>{{ loading ? 'Finding stations…' : 'Radio unavailable' }}</span>
         <p role="status">{{ message || (state === 'buffering' ? 'Tuning in…' : state === 'playing' ? `${station?.country} / Live radio` : 'Choose a station. Press play.') }}</p>
       </div>
@@ -127,18 +131,23 @@ onBeforeUnmount(() => { disposed = true; stop(); observer?.disconnect(); documen
   &__art { container-type: inline-size; position: relative; overflow: hidden; border-radius: var(--radius-xl); padding: 7% 7% 6%; background: #e9eae6; color: #222722; font-family: var(--font-sans); }
   &__header { display: flex; justify-content: space-between; font-size: 2.5cqw; font-weight: 400; font-style: normal; }
   &__tuning { margin-top: 6cqw; text-align: center; }
-  select { width: 100%; padding: .5em 1.3em .5em .5em; border: 0; background: transparent; color: inherit; font: inherit; font-size: 3.6cqw; text-align: center; text-overflow: ellipsis; cursor: pointer; }
+  &__station { position: relative; display: grid; place-items: center; min-height: 44px; font-size: 3.6cqw; }
+  &__station > span { display: block; width: 100%; padding-inline: 28px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+  &__station > svg { position: absolute; right: 4px; top: calc(50% - 9px); width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; pointer-events: none; }
+  &__station select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; appearance: none; -webkit-appearance: none; cursor: pointer; font-size: 16px; }
+  &__station:focus-within { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
   &__tuning p { min-height: 2.5em; margin: .5em 0 0; font-size: 2.6cqw; line-height: 1.3; font-weight: 400; font-style: normal; }
-  &__controls { display: flex; justify-content: center; align-items: center; gap: 4cqw; }
-  button { display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 0; background: transparent; color: inherit; cursor: pointer; }
+  &__controls { display: grid; grid-template-columns: 44px max(44px, 14cqw) 44px; justify-content: center; align-items: center; justify-items: center; gap: 4cqw; }
+  button { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; padding: 0; display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 0; background: transparent; color: inherit; cursor: pointer; }
   button:disabled { opacity: .4; cursor: default; }
   button:active:not(:disabled) { transform: scale(.96); }
   button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
   button svg { width: 22px; height: 22px; fill: currentColor; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
   &__play { width: 14cqw; height: 14cqw; background: #222722 !important; color: #f3f3eb !important; border-radius: 50%; }
-  &__volume { display: flex; align-items: center; justify-content: center; gap: 3cqw; margin: 4cqw auto 0; font-size: 2.5cqw; font-style: normal; font-weight: 400; }
-  &__volume input { width: 38%; accent-color: #485b50; height: 24px; cursor: pointer; }
-  &__volume > span:last-child { min-width: 3ch; }
+  &__volume { display: grid; grid-template-columns: 3ch 38% 3ch; align-items: center; justify-content: center; gap: 3cqw; margin: 4cqw auto 0; font-size: 2.5cqw; font-style: normal; font-weight: 400; }
+  &__volume input { width: 100%; margin: 0; min-width: 0; accent-color: #485b50; height: 24px; cursor: pointer; }
+  &__volume > span:first-child { text-align: right; }
+  &__volume > span:last-child { text-align: left; font-variant-numeric: tabular-nums; }
   &__retry { margin: .5rem auto 0; font: inherit; text-decoration: underline; }
   figcaption { display: flex; justify-content: space-between; gap: 1rem; padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
   figcaption a { color: inherit; font-size: .75em; }

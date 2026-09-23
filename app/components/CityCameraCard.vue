@@ -191,7 +191,7 @@ onBeforeUnmount(() => {
     color: #f1ffbb; pointer-events: none;
   }
   &__play { position: absolute; z-index: 3; bottom: 13cqw; left: 50%; transform: translateX(-50%); border: 0; border-radius: 999px; padding: 0.75em 1em; background: #f1ffbb; color: #213735; font: inherit; cursor: pointer; }
-  &__nav {
+  &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     position: absolute; z-index: 2; top: 0; bottom: 0; width: 35%;
     border: 0; padding: 0; background: transparent; cursor: pointer;
     -webkit-tap-highlight-color: transparent;

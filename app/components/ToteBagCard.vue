@@ -113,9 +113,9 @@ onBeforeUnmount(() => {
   &__heading { top: 8cqw; } &__footer { bottom: 8cqw; }
   &__drawing { position: absolute; top: 50%; left: 0; width: 100%; transform: translateY(-50%); overflow: visible; }
   &__lines { fill: none; stroke: currentColor; stroke-width: 1; stroke-linejoin: miter; }
-  &__nav { position: absolute; top: 0; bottom: 0; width: 30%; border: 0; background: transparent; cursor: pointer; padding: 0; }
+  &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 30%; border: 0; background: transparent; cursor: pointer; padding: 0; }
   &__nav::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .16s ease; pointer-events: none; }
-  &__nav:hover::after { opacity: 1; }
+  @media (hover: hover) { &__nav:hover::after { opacity: 1; } }
   &__nav--prev { left: 0; } &__nav--next { right: 0; }
   &__nav--prev::after { background: linear-gradient(90deg, #ffffff14, transparent); }
   &__nav--next::after { background: linear-gradient(-90deg, #ffffff14, transparent); }

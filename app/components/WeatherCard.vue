@@ -141,7 +141,7 @@ onBeforeUnmount(() => {
   &__details { font-size: 3cqw; line-height: 1.65; }
   &__empty { position: absolute; inset: 0; display: grid; place-content: center; gap: var(--space-3); font-size: 4cqw; }
   button:not(.weather-pin__nav) { font: inherit; color: inherit; padding: .5em 1em; border: 1px solid currentColor; border-radius: 999px; background: transparent; cursor: pointer; }
-  &__nav {
+  &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     position: absolute; z-index: 2; top: 0; bottom: 0; width: 35%;
     border: 0; border-radius: 0; padding: 0; background: transparent; cursor: pointer;
     -webkit-tap-highlight-color: transparent;

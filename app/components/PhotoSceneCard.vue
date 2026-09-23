@@ -101,9 +101,9 @@ onBeforeUnmount(() => {
   &__number { position: absolute; top: 7cqw; left: 8cqw; font-size: 3cqw; font-weight: 400; font-style: normal; }
   &__word { position: absolute; inset: 0; display: grid; place-items: center; line-height: 1; letter-spacing: -.04em; padding: 0 6cqw 3cqw; white-space: nowrap; pointer-events: none; text-shadow: 0 1px 12px #0002; }
   &__footer { position: absolute; bottom: 7cqw; left: 8cqw; display: grid; gap: 1cqw; font-size: 2.5cqw; line-height: 1.2; font-weight: 400; font-style: normal; }
-  &__nav { position: absolute; top: 0; bottom: 0; width: 33%; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; }
+  &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 33%; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; }
   &__nav::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .16s ease; }
-  &__nav:hover::after { opacity: 1; }
+  @media (hover: hover) { &__nav:hover::after { opacity: 1; } }
   &__nav--prev { left: 0; } &__nav--next { right: 0; }
   &__nav--prev::after { background: linear-gradient(90deg, #0003, transparent); }
   &__nav--next::after { background: linear-gradient(-90deg, #0003, transparent); }

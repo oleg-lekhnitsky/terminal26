@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { touchPair, pinchTransform } from '~/utils/posterTouch'
 import { snapAxis, snapRotation } from '~/utils/posterSnapping'
+import { hasPosterContent } from '~/utils/posterContent'
 import { textPresets } from '~/utils/textRenderer'
 const { activeFont } = useFontSelection()
 const host = useTemplateRef('host')
@@ -56,9 +58,27 @@ const snapGuides = ref<{ x: number | null; y: number | null }>({ x: null, y: nul
 const rotationLabel = ref<number | null>(null)
 const textWidth = ref(800)
 const textBoxHeight = ref<number | null>(null)
+const touchPoints = new Map<number, { x: number; y: number }>()
+let pinch: { pair: ReturnType<typeof touchPair>; center: { x: number; y: number }; size: number; width: number; height: number | null; angle: number; offset: { x: number; y: number }; scale: number } | undefined
+function preserveTextFocus(event: PointerEvent) { if (event.pointerType === 'mouse') event.preventDefault() }
+function refocusText() { if (editing.value) textEditor.value?.focus({ preventScroll: true }) }
 let gesture: { id: number; mode: 'move' | 'rotate' | 'resize' | 'left' | 'right' | 'top' | 'bottom'; x: number; y: number; offsetX: number; offsetY: number; angle: number; startAngle: number; cx: number; cy: number; scale: number; size: number; width: number; height: number; moved: boolean } | undefined
 function beginTransform(event: PointerEvent, mode: 'move' | 'rotate' | 'resize' | 'left' | 'right' | 'top' | 'bottom') {
-  if (event.button !== 0 || gesture || (mode === 'move' && editing.value)) return
+  if (event.button !== 0 || (mode === 'move' && editing.value)) return
+  if (event.pointerType === 'touch' && mode === 'move') {
+    if (touchPoints.size >= 2) return
+    touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY })
+    if (gesture && touchPoints.size === 2) {
+      event.preventDefault()
+      const points = [...touchPoints.values()]
+      const rect = canvas.value!.getBoundingClientRect()
+      pinch = { pair: touchPair(points[0]!, points[1]!), center: { x: rect.left + (480 + textOffset.value.x) * rect.width / 960, y: rect.top + (600 + textOffset.value.y) * rect.width / 960 }, size: typeSize.value, width: textWidth.value, height: textBoxHeight.value, angle: rotation.value, offset: { ...textOffset.value }, scale: 960 / rect.width }
+      gesture.moved = true
+      ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+      return
+    }
+  }
+  if (gesture) return
   const rect = canvas.value?.getBoundingClientRect()
   if (!rect?.width) return
   event.preventDefault()
@@ -73,6 +93,20 @@ function beginTransform(event: PointerEvent, mode: 'move' | 'rotate' | 'resize' 
   ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
 }
 function updateTransform(event: PointerEvent) {
+  if (touchPoints.has(event.pointerId)) touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY })
+  if (pinch && touchPoints.size === 2) {
+    const points = [...touchPoints.values()]
+    const next = pinchTransform(pinch.pair, touchPair(points[0]!, points[1]!), pinch.center)
+    const ratio = Math.max(36 / pinch.size, next.ratio)
+    typeSize.value = pinch.size * ratio
+    textWidth.value = pinch.width * ratio
+    if (pinch.height !== null) textBoxHeight.value = pinch.height * ratio
+    textOffset.value = { x: pinch.offset.x + (next.x - pinch.center.x) * pinch.scale, y: pinch.offset.y + (next.y - pinch.center.y) * pinch.scale }
+    rotation.value = snapRotation(pinch.angle + next.angle)
+    rotationLabel.value = Math.round(((rotation.value % 360) + 360) % 360)
+    snapGuides.value = { x: null, y: null }
+    return
+  }
   if (!gesture || gesture.id !== event.pointerId) return
   const g = gesture
   const dx = event.clientX - g.x, dy = event.clientY - g.y
@@ -119,6 +153,18 @@ function updateTransform(event: PointerEvent) {
   }
 }
 function endTransform(event: PointerEvent) {
+  touchPoints.delete(event.pointerId)
+  if (pinch) {
+    pinch = undefined
+    touchPoints.clear()
+    gesture = undefined
+    transforming.value = false
+    snapGuides.value = { x: null, y: null }
+    rotationLabel.value = null
+    const target = event.currentTarget as HTMLElement
+    if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId)
+    return
+  }
   if (!gesture || gesture.id !== event.pointerId) return
   const edit = gesture.mode === 'move' && !gesture.moved && event.type === 'pointerup'
   gesture = undefined
@@ -153,6 +199,8 @@ type TextLayer = {
   layout: { top: number; fontSize: number; height: number }; font: { style: string; weight: number };
 }
 const savedTexts = ref<TextLayer[]>([])
+const posterContent = computed(() => ({ photo: hasPhoto.value, texts: [...savedTexts.value.map(layer => layer.title), ...(hasText.value ? [title.value] : [])] }))
+const canPublish = computed(() => hasPosterContent(posterContent.value))
 let nextTextId = 0
 let currentTextId = 0
 function snapshotText(): TextLayer {
@@ -210,6 +258,13 @@ function savedTextStyle(layer: TextLayer) {
   return { left: `${(960 - layer.width) / 19.2}%`, width: `${layer.width / 9.6}%`, top: `${layer.layout.top}%`, height: `${layer.layout.height}%`, transform: `translate(${layer.offset.x / 9.6}cqw, ${layer.offset.y / 9.6}cqw) rotate(${layer.rotation}deg)`, color: layer.ink, fontSize: `${layer.size / 9.6}cqw`, fontWeight: layer.font.weight, fontStyle: layer.font.style, textAlign: layer.alignment, lineHeight: layer.lineHeight }
 }
 const cameraOpen = ref(false)
+const cameraFacing = ref<'user' | 'environment'>('environment')
+const cameraCanFlip = ref(false)
+async function flipCamera() {
+  if (cameraStarting.value) return
+  cameraFacing.value = cameraFacing.value === 'user' ? 'environment' : 'user'
+  await openCamera()
+}
 const cameraStarting = ref(false)
 const hasPhoto = ref(false)
 const publishing = ref(false)
@@ -263,13 +318,20 @@ async function openCamera() {
   backgroundPickerOpen.value = false
   message.value = ''
   if (!navigator.mediaDevices?.getUserMedia) { message.value = 'Camera needs a secure connection (HTTPS or localhost).'; return }
+  const switching = cameraOpen.value
   stopCamera()
+  cameraOpen.value = switching
   const version = ++cameraVersion
   cameraStarting.value = true
   try {
-    const next = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1440 }, height: { ideal: 1800 } }, audio: false })
+    const next = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cameraFacing.value }, width: { ideal: 1440 }, height: { ideal: 1800 } }, audio: false })
     if (disposed || version !== cameraVersion) { next.getTracks().forEach(track => track.stop()); return }
     stream = next
+    const actualFacing = next.getVideoTracks()[0]?.getSettings().facingMode
+    if (actualFacing === 'user' || actualFacing === 'environment') cameraFacing.value = actualFacing
+    void navigator.mediaDevices.enumerateDevices().then(devices => {
+      if (version === cameraVersion) cameraCanFlip.value = devices.filter(device => device.kind === 'videoinput').length > 1
+    }).catch(() => { if (version === cameraVersion) cameraCanFlip.value = true })
     cameraOpen.value = true
     await nextTick()
     if (!video.value || disposed || version !== cameraVersion) return
@@ -295,12 +357,14 @@ async function setPhoto(blob: Blob) {
   finally { URL.revokeObjectURL(url) }
 }
 function capture() {
-  if (!video.value?.videoWidth) return
+  if (cameraStarting.value || !video.value?.videoWidth) return
   const still = document.createElement('canvas')
   const ratio = Math.min(1, 1600 / Math.max(video.value.videoWidth, video.value.videoHeight))
   still.width = Math.round(video.value.videoWidth * ratio)
   still.height = Math.round(video.value.videoHeight * ratio)
-  still.getContext('2d')!.drawImage(video.value, 0, 0, still.width, still.height)
+  const context = still.getContext('2d')!
+  if (cameraFacing.value === 'user') { context.translate(still.width, 0); context.scale(-1, 1) }
+  context.drawImage(video.value, 0, 0, still.width, still.height)
   stopCamera()
   still.toBlob(blob => { if (blob && !disposed) void setPhoto(blob) }, 'image/jpeg', .92)
 }
@@ -409,11 +473,12 @@ async function loadGallery(more = false) {
 }
 async function publish() {
   if (publishing.value || !configured.value) return
+  if (!canPublish.value) { message.value = 'Add text or take a photo before publishing.'; return }
   publishing.value = true
   message.value = ''
   try {
     const blob = await posterBlob()
-    const result = await $fetch('/api/posters', { method: 'POST', body: blob, headers: { 'Content-Type': 'image/png' } })
+    const result = await $fetch('/api/posters', { method: 'POST', body: blob, headers: { 'Content-Type': 'image/png', 'X-Poster-Content': encodeURIComponent(JSON.stringify(posterContent.value)) } })
     if (!disposed) { posters.value.unshift(result); message.value = 'Published. Your poster is now in the shared gallery.' }
   } catch (error: any) { message.value = error?.data?.statusMessage || 'Could not publish. Your draft is still here.' }
   finally { publishing.value = false }
@@ -453,11 +518,11 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
     <div v-show="studioOpen" class="poster-maker__art" :style="{ color: '#ffffff' }">
       <canvas ref="canvas" width="960" height="1200" role="img" aria-label="Poster background" @pointerdown="finishEditing" />
       <header v-if="!editing && !cameraOpen" class="poster-maker__heading"><button type="button" @click="closeStudio">← Back</button><button type="button" @click="openGallery">Gallery ↗</button></header>
-      <header v-else-if="!cameraOpen" class="poster-maker__edit-heading">
+      <header v-else-if="!cameraOpen" class="poster-maker__edit-heading" @click="refocusText">
         <div role="toolbar" aria-label="Text formatting">
-          <button type="button" :aria-label="`Alignment: ${alignment}. Change alignment`" @pointerdown.prevent @click="cycleAlignment"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 13h16"/><path :d="alignment === 'left' ? 'M4 9h10M4 17h10' : alignment === 'right' ? 'M10 9h10M10 17h10' : 'M7 9h10M7 17h10'"/></svg></button>
-          <button type="button" aria-label="All caps" :aria-pressed="allCaps" @pointerdown.prevent @click="allCaps = !allCaps">{{ allCaps ? 'AA' : 'Aa' }}</button>
-          <button type="button" aria-label="Line height" :aria-expanded="spacingOpen" @pointerdown.prevent @click="spacingOpen = !spacingOpen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5h10M10 12h10M10 19h10M4 4v16m-2-2 2 2 2-2M2 6l2-2 2 2"/></svg></button>
+          <button type="button" :aria-label="`Alignment: ${alignment}. Change alignment`" @pointerdown="preserveTextFocus" @click="cycleAlignment"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 13h16"/><path :d="alignment === 'left' ? 'M4 9h10M4 17h10' : alignment === 'right' ? 'M10 9h10M10 17h10' : 'M7 9h10M7 17h10'"/></svg></button>
+          <button type="button" aria-label="All caps" :aria-pressed="allCaps" @pointerdown="preserveTextFocus" @click="allCaps = !allCaps">{{ allCaps ? 'AA' : 'Aa' }}</button>
+          <button type="button" aria-label="Line height" :aria-expanded="spacingOpen" @pointerdown="preserveTextFocus" @click="spacingOpen = !spacingOpen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5h10M10 12h10M10 19h10M4 4v16m-2-2 2 2 2-2M2 6l2-2 2 2"/></svg></button>
         </div>
         <button type="button" class="poster-maker__done" @click="finishEditing">Done</button>
       </header>
@@ -486,7 +551,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
         <button v-if="!hasPhoto" type="button" aria-label="Background color" title="Background color" :aria-expanded="backgroundPickerOpen" @click="backgroundPickerOpen = !backgroundPickerOpen"><span class="poster-maker__background-swatch" :style="{ backgroundColor }"/></button>
         <button type="button" aria-label="Add text" title="Add text" @click="addText">Aa</button>
         <button type="button" aria-label="Download poster" title="Download" @click="download"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg></button>
-        <button class="poster-maker__publish" type="button" :disabled="!configured || publishing" :aria-busy="publishing" :aria-label="publishing ? 'Publishing poster' : 'Publish poster to public gallery'" :title="configured ? 'Publish to public gallery' : 'Publishing is not available yet'" @click="publish">{{ publishing ? 'Publishing…' : 'Publish' }}</button>
+        <button class="poster-maker__publish" type="button" :disabled="!configured || publishing || !canPublish" :aria-busy="publishing" :aria-label="publishing ? 'Publishing poster' : 'Publish poster to public gallery'" :title="!canPublish ? 'Add text or take a photo before publishing' : configured ? 'Publish to public gallery' : 'Publishing is not available yet'" @click="publish">{{ publishing ? 'Publishing…' : 'Publish' }}</button>
       </div>
       <section v-if="backgroundPickerOpen && !hasPhoto && !cameraOpen && !editing" class="poster-maker__background-picker" aria-label="Background color" @keydown.esc.stop="backgroundPickerOpen = false">
         <div class="poster-maker__swatches" role="group" aria-label="Background colors">
@@ -494,15 +559,16 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
         </div>
       </section>
       <section v-if="editing && !cameraOpen" class="poster-maker__settings" aria-label="Type settings" @keydown.esc.stop="finishEditing">
-        <div class="poster-maker__swatches" role="group" aria-label="Text color">
-          <button v-for="color in typePalette" :key="color" type="button" :style="{ '--swatch': color }" :aria-label="`Text color ${color}`" :aria-pressed="ink === color" @pointerdown.prevent @click="ink = color"><span aria-hidden="true"/></button>
+        <div class="poster-maker__swatches" role="group" aria-label="Text color" @click="refocusText">
+          <button v-for="color in typePalette" :key="color" type="button" :style="{ '--swatch': color }" :aria-label="`Text color ${color}`" :aria-pressed="ink === color" @pointerdown="preserveTextFocus" @click="ink = color"><span aria-hidden="true"/></button>
         </div>
         <label v-if="spacingOpen" class="poster-maker__setting-range"><span>Line height <output>{{ lineHeight.toFixed(2) }}</output></span><input v-model.number="lineHeight" type="range" min="0.8" max="1.8" step="0.02"></label>
       </section>
       <template v-if="cameraOpen">
-        <video ref="video" autoplay muted playsinline class="poster-maker__camera" aria-label="Camera preview" />
+        <video ref="video" autoplay muted playsinline class="poster-maker__camera" :class="{ 'is-front': cameraFacing === 'user' }" aria-label="Camera preview" />
         <header class="poster-maker__heading poster-maker__camera-heading"><button type="button" @click="stopCamera">← Back</button></header>
-        <div class="poster-maker__capture"><button class="poster-maker__shutter" type="button" aria-label="Take photo" @click="capture"/></div>
+        <div class="poster-maker__capture"><button class="poster-maker__shutter" type="button" aria-label="Take photo" :disabled="cameraStarting" @click="capture"/>
+          <button v-if="cameraCanFlip" class="poster-maker__flip" type="button" :disabled="cameraStarting" :aria-label="cameraFacing === 'user' ? 'Use rear camera' : 'Use front camera'" @click="flipCamera"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a9 9 0 0 1 15-3l2 2M21 2v5h-5M20 16a9 9 0 0 1-15 3l-2-2M3 22v-5h5"/></svg></button></div>
       </template>
       <button v-if="message" class="poster-maker__message" type="button" role="status" @click="message = ''">{{ message }}</button>
     </div>
@@ -529,7 +595,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__add:hover { background: #fff !important; }
   &__add svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
   &__published { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-  &__previous, &__next { position: absolute; top: 0; bottom: 0; width: 30%; padding: 0; background: transparent; }
+  &__previous, &__next { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 30%; padding: 0; background: transparent; }
   &__previous { left: 0; }
   &__next { right: 0; }
   &__previous::after, &__next::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .16s ease; pointer-events: none; }
@@ -612,12 +678,37 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__setting-range input::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #fff; }
   &__setting-range input:focus-visible { outline: 1px solid #fff; outline-offset: 2px; border-radius: 8px; }
   &__camera { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+  &__camera.is-front { transform: scaleX(-1); }
+  &__flip { position: absolute; right: 0; width: 44px; height: 44px; padding: 10px; display: grid; place-items: center; border-radius: 50%; background: #0004 !important; }
+  &__flip svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  &__flip:disabled, &__shutter:disabled { opacity: .4; }
   &__capture { position: absolute; bottom: 6cqw; inset-inline: 7cqw; display: flex; align-items: center; justify-content: center; gap: 5cqw; color: #fff; }
   &__camera-heading { color: #fff; text-shadow: 0 1px 3px #000; }
   &__shutter { width: 56px; height: 56px; border-radius: 50%; background: #fff !important; border: 4px solid #ffffff80 !important; box-shadow: inset 0 0 0 3px #777; }
   &__message { position: absolute; bottom: 17%; inset-inline: 7cqw; padding: .8rem; border-radius: .5rem; background: #222c !important; color: #fff !important; font-size: max(11px, 2.5cqw); line-height: 1.4; }
   figcaption { padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
 }
+@media (pointer: coarse) {
+  .poster-maker__text-object:has(.poster-maker__type:not(.is-editing)) { outline-color: #ffffff80; }
+  .poster-maker__text-object .poster-maker__edge, .poster-maker__text-object .poster-maker__resize { opacity: 1; }
+  .poster-maker button.poster-maker__edge, .poster-maker button.poster-maker__resize { width: 44px; height: 44px; min-height: 44px !important; }
+  .poster-maker button.poster-maker__resize--tl { top: -22px; left: -22px; }
+  .poster-maker button.poster-maker__resize--tr { top: -22px; right: -22px; }
+  .poster-maker button.poster-maker__resize--bl { bottom: -22px; left: -22px; }
+  .poster-maker button.poster-maker__resize--br { bottom: -22px; right: -22px; }
+  .poster-maker button.poster-maker__edge--left { left: -22px; top: calc(50% - 22px); }
+  .poster-maker button.poster-maker__edge--right { right: -22px; top: calc(50% - 22px); }
+  .poster-maker button.poster-maker__edge--top { top: -22px; left: calc(50% - 22px); }
+  .poster-maker button.poster-maker__edge--bottom { bottom: -22px; left: calc(50% - 22px); }
+  .poster-maker button.poster-maker__rotate-zone { display: none; }
+  .poster-maker__swatches button { flex-basis: 44px; width: 44px; min-height: 44px; }
+  .poster-maker__edit-heading button { min-width: 44px; min-height: 44px; }
+  .poster-maker__heading { font-size: max(12px, 2.5cqw); }
+  .poster-maker__tools { padding-inline: 3cqw; }
+  .poster-maker__tools button { min-width: 44px; }
+  .poster-maker__tools button.poster-maker__publish { padding-inline: 12px; }
+}
+
 .poster-slide-enter-active, .poster-slide-leave-active { transition: opacity .8s ease; }
 .poster-slide-enter-from, .poster-slide-leave-to { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .poster-slide-enter-active, .poster-slide-leave-active { transition: none; } }

@@ -1,3 +1,4 @@
+import { hasPosterContent } from '../../../app/utils/posterContent'
 import { randomUUID } from 'node:crypto'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { posterPrefix, posterStorage } from '../../utils/posterStorage'
@@ -5,6 +6,9 @@ import { posterByteLimit, validatePosterPng } from '../../utils/posterValidation
 const attempts = new Map<string, number>()
 export default defineEventHandler(async event => {
   if (getHeader(event, 'origin') !== String(useRuntimeConfig(event).siteUrl).replace(/\/$/, '')) throw createError({ statusCode: 403, statusMessage: 'Invalid publishing origin.' })
+  let content: unknown
+  try { content = JSON.parse(decodeURIComponent(getHeader(event, 'x-poster-content') || '')) } catch { /* Missing or invalid content is blank. */ }
+  if (!hasPosterContent(content)) throw createError({ statusCode: 400, statusMessage: 'Add text or take a photo before publishing.' })
   const storage = posterStorage(event)
   if (!storage) throw createError({ statusCode: 503, statusMessage: 'Publishing is not set up yet. You can still download your poster.' })
   const now = Date.now()

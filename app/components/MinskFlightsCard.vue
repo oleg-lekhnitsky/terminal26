@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
   &__notice { padding: var(--space-2); font-size: var(--text-sm); }
   button:not(.flights-pin__nav) { font: inherit; color: inherit; border: 0; background: transparent; padding: .6em; cursor: pointer; text-decoration: underline; text-underline-offset: .2em; }
   button:not(.flights-pin__nav):active { transform: scale(.96); }
-  &__nav {
+  &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     position: absolute; z-index: 2; top: 0; bottom: 0; width: 35%;
     border: 0; padding: 0; background: transparent; cursor: pointer;
     -webkit-tap-highlight-color: transparent;
