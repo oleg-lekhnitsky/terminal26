@@ -50,6 +50,7 @@ function advanceWord() {
         :color="preset.color"
         :letter-spacing="preset.letterSpacing"
         :whole-text="preset.id === 'words'"
+        :speed="preset.id === 'words' ? 1.5 : 1"
         :font-weight="specimenFont.weight"
         :font-style="specimenFont.style"
         @cycle-complete="advanceWord"

@@ -19,6 +19,7 @@ const colors = computed(() => ({
   '--rim': `hsl(${hue.value + 51} 97% 68%)`,
   '--halo': `hsl(${hue.value - 34} 98% 80%)`,
   '--core': `hsl(${hue.value - 5} 75% 57%)`,
+  '--core-clear': `hsl(${hue.value - 5} 75% 57% / 0)`,
   '--button': `hsl(${hue.value - 5} 66% 44% / .42)`,
   '--color-duration': `${motionSystem.enter}s`,
   '--pulse-duration': `${motionSystem.enter * 2}s`,
@@ -76,15 +77,16 @@ const colors = computed(() => ({
   &__core { inset: 15%; background: var(--core); filter: blur(8cqw); border-radius: 40%; }
   &__pulse {
     position: absolute;
-    inline-size: 24cqw;
-    block-size: 9cqw;
-    border-radius: 999px;
-    background: var(--core);
-    filter: blur(3cqw);
+    inline-size: 48cqw;
+    block-size: 32cqw;
+    // Fade inside the layer bounds so Safari cannot clip an expanding blur surface.
+    background: radial-gradient(ellipse closest-side, var(--core) 0%, var(--core-clear) 100%);
     pointer-events: none;
     animation: gradient-pulse var(--pulse-duration) var(--ease-flow) both;
   }
   &__button {
+    appearance: none;
+    -webkit-appearance: none;
     position: relative;
     display: grid;
     place-items: center;
@@ -114,7 +116,7 @@ const colors = computed(() => ({
 }
 @keyframes gradient-pulse {
   from { transform: scale(1); opacity: .65; }
-  to { transform: scale(4, 6); opacity: 0; }
+  to { transform: scale(2, 1.7); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gradient-pin__art, .gradient-pin__button, .gradient-pin__rim, .gradient-pin__halo, .gradient-pin__core { transition: none; }
