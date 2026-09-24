@@ -5,6 +5,9 @@ import { createTextRenderer, motionSystem, typographySystem, isContinuousPreset,
 const props = withDefaults(defineProps<{
   text: string
   wholeText?: boolean
+  preserveCase?: boolean
+  staggerByWords?: boolean
+  lineHeight?: number
   preset?: TextPreset
   replayKey?: number
   loop?: boolean
@@ -13,6 +16,7 @@ const props = withDefaults(defineProps<{
   fontStyle?: 'normal' | 'italic'
   letterSpacing?: number
   color?: string
+  hold?: number
   duration?: number
   stagger?: number
   delay?: number
@@ -51,16 +55,17 @@ let fontRequest = 0
 const clamp = (value: number, max: number) => Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : 0
 const duration = computed(() => Math.max(0.1, clamp(props.duration, 5)))
 const stagger = computed(() => clamp(props.stagger, 0.5))
+const hold = computed(() => props.preset === 'poster' ? Math.max(0, props.hold ?? motionSystem.hold) : motionSystem.hold)
 const endTime = () => renderer?.duration(duration.value, stagger.value, props.preset) ?? 0
 
 function draw() {
   const still = motion?.matches ?? false
   const frame = props.preset === 'poster'
-    ? { time: props.loop ? time % (endTime() + motionSystem.hold + motionSystem.exit + motionSystem.rest) : Math.min(time, (endTime() + duration.value) / 2), opacity: 1 }
+    ? { time: props.loop ? time % (endTime() + hold.value + motionSystem.exit + motionSystem.rest) : Math.min(time, (endTime() + duration.value) / 2), opacity: 1 }
     : isContinuousPreset(props.preset)
     ? { time, opacity: 1 }
     : sequenceFrame(time, endTime(), props.loop)
-  renderer?.draw(still ? endTime() : frame.time, duration.value, stagger.value, props.preset, still ? 1 : frame.opacity, still)
+  renderer?.draw(still ? endTime() : frame.time, duration.value, stagger.value, props.preset, still ? 1 : frame.opacity, still, hold.value)
 }
 
 function replay() {
@@ -87,7 +92,7 @@ function tick(now: number) {
   const previousTime = time
   time += elapsed - waiting
   if (props.loop && !isContinuousPreset(props.preset)) {
-    const cycle = endTime() + motionSystem.hold + motionSystem.exit + motionSystem.rest
+    const cycle = endTime() + hold.value + motionSystem.exit + motionSystem.rest
     if (Math.floor(time / cycle) > Math.floor(previousTime / cycle)) emit('cycleComplete')
   }
   if (props.loop && props.preset === 'words' && props.wholeText) {
@@ -173,14 +178,14 @@ onMounted(() => {
   initialize()
 })
 
-watch(() => [props.text, props.wholeText, props.fontFamily, props.fontWeight, props.fontStyle, props.letterSpacing, props.color, props.preset], () => {
+watch(() => [props.text, props.wholeText, props.preserveCase, props.staggerByWords, props.lineHeight, props.fontFamily, props.fontWeight, props.fontStyle, props.letterSpacing, props.color, props.preset], () => {
   if (renderer) {
     void loadFont()
     replay()
   }
 })
 watch(() => [props.replayKey, props.delay], replay)
-watch(() => [props.paused, props.speed, props.duration, props.stagger, props.loop], syncPlayback)
+watch(() => [props.paused, props.speed, props.hold, props.duration, props.stagger, props.loop], syncPlayback)
 
 onBeforeUnmount(() => {
   disposed = true

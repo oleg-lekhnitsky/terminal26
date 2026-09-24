@@ -3,6 +3,9 @@ import { oneShotText } from './fontSymbols.ts'
 export interface TextAppearance {
   text: string
   wholeText?: boolean
+  preserveCase?: boolean
+  staggerByWords?: boolean
+  lineHeight?: number
   fontFamily: string
   fontWeight: number
   fontStyle?: 'normal' | 'italic'
@@ -229,11 +232,11 @@ export function carousel18Pose(time: number, index: number, count: number, durat
   }
 }
 
-export function posterLinePose(time: number, index: number, duration: number, stagger: number, count: number) {
+export function posterLinePose(time: number, index: number, duration: number, stagger: number, count: number, hold = motionSystem.hold) {
   const elapsed = time - index * stagger
   const enterDuration = Math.max(0.1, duration)
   const enter = flow(elapsed / enterDuration)
-  const exitStart = duration + Math.max(0, count - 1) * stagger + motionSystem.hold
+  const exitStart = duration + Math.max(0, count - 1) * stagger + hold
   const exit = flow((time - exitStart - index * stagger) / motionSystem.exit)
   return { y: (1 - enter - exit) * motionSystem.travel, opacity: enter * (1 - exit) }
 }
@@ -405,7 +408,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         const graphemes = appearance.preset === 'words' && appearance.wholeText ? [text.trim()] : paragraph
           ? wrapTextLines(text, 0.78 / 0.05 * 100, value => context.measureText(value).width)
           : multiline
-          ? (poster ? appearance.text.toUpperCase() : appearance.text).split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+          ? (poster && !appearance.preserveCase ? appearance.text.toUpperCase() : appearance.text).split(/\r?\n/).map(line => line.trim()).filter(Boolean)
           : appearance.preset === 'letter' || appearance.preset === 'words' || appearance.preset === 'numbers'
           ? text.trim().split(/\s+/).filter(Boolean)
           : Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text), item => item.segment)
@@ -435,12 +438,19 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         wordWidth = layout.width
         const origin = (canvas.width - wordWidth) / 2
         const bounds = graphemes.map(letter => context.measureText(letter))
-        const lineAdvance = multiline ? fontSize * (poster ? 0.85 : 1.35) : 0
+        const lineAdvance = multiline ? fontSize * (poster ? (appearance.lineHeight ?? 0.85) : 1.35) : 0
         const baseline = centeredTextBaseline(canvas.height, bounds, lineAdvance)
-        graphemes.forEach((letter, index) => {
+        const runs = graphemes.flatMap((line, index) => {
+          if (!poster || !appearance.staggerByWords) return [{ letter: line, index, offset: 0 }]
+          return Array.from(line.matchAll(/\S+/g), match => ({
+            letter: match[0], index,
+            offset: context.measureText(line.slice(0, match.index)).width,
+          }))
+        })
+        runs.forEach(({ letter, index, offset }) => {
           configureTextFont(context, appearance, fontSize)
           const cursor = paragraph ? origin : multiline ? (canvas.width - layout.positions[index]!.width) / 2 : origin + layout.positions[index]!.x
-          const metrics = bounds[index]!
+          const metrics = context.measureText(letter)
           const lineBaseline = single && !multiline
             ? centeredTextBaseline(canvas.height, [metrics])
             : baseline + index * lineAdvance
@@ -455,7 +465,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
           context.fillStyle = appearance.color
           context.fillText(letter, padding + left, padding + ascent)
           const texture = uploadTexture()
-          letters.push({ texture, x: cursor - left - padding + source.width / 2, y: lineBaseline - ascent - padding + source.height / 2, width: source.width, height: source.height, centerOffset: -left - padding + source.width / 2 - metrics.width / 2 })
+          letters.push({ texture, x: cursor + offset - left - padding + source.width / 2, y: lineBaseline - ascent - padding + source.height / 2, width: source.width, height: source.height, centerOffset: -left - padding + source.width / 2 - metrics.width / 2 })
         })
       },
       duration(duration: number, stagger: number, preset: TextPreset) {
@@ -469,7 +479,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         if (preset === 'slide') return duration + motionSystem.hold
         return duration + Math.max(0, letters.length - 1) * stagger
       },
-      draw(time: number, duration: number, stagger: number, preset: TextPreset, opacity = 1, still = false) {
+      draw(time: number, duration: number, stagger: number, preset: TextPreset, opacity = 1, still = false, hold = motionSystem.hold) {
         gl.clearColor(0, 0, 0, 0)
         gl.clear(gl.COLOR_BUFFER_BIT)
         gl.uniform2f(locations.u_resolution!, canvas.width, canvas.height)
@@ -541,7 +551,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
             return
           }
           if (preset === 'poster') {
-            const pose = still ? { y: 0, opacity: 1 } : posterLinePose(time, index, duration, stagger, letters.length)
+            const pose = still ? { y: 0, opacity: 1 } : posterLinePose(time, index, duration, stagger, letters.length, hold)
             render(letter, letter.x, letter.y + fontSize * pose.y, 1, 0, pose.opacity)
             return
           }

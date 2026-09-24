@@ -12,6 +12,7 @@ const { activeFont } = useFontSelection()
         <FontPresetCard v-else :preset="preset" />
         <TypeMockupCard v-if="preset.id === 'letter'" />
         <TypeMockupCard v-if="preset.id === 'slide'" kind="truck" />
+        <AlphabetCard v-if="preset.id === 'poster'" />
         <TypeMockupCard v-if="preset.id === 'poster'" kind="coffee" />
         <ToteBagCard v-if="preset.id === 'words'" />
       </template>
