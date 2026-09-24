@@ -1,8 +1,8 @@
 import { flow } from './textRenderer.ts'
 
 export const wheelPreset = Object.freeze({
-  count: 18, planeSize: 380, planeRotation: 60, orbitRadius: 0,
-  distance: 900, perspective: 130, rotationX: 90, rotationY: -90, rotationZ: 0,
+  count: 18, planeSize: 380, planeRotation: 90, orbitRadius: 0,
+  distance: 900, perspective: 150, rotationX: 90, rotationY: -90, rotationZ: 0,
   duration: 8.5, lightX: -1.8, lightY: 1.6, lightZ: -3,
   lightTargetY: -.15, lightAngle: 28, lightPenumbra: 1,
   lightFadeStartY: -.3, lightFadeEndY: .08,
