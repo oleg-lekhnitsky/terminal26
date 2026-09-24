@@ -3,14 +3,21 @@ import { motionSystem } from '~/utils/textRenderer'
 import type { FontVariantId } from '~/utils/fontVariants'
 
 const { selectedFont, activeFont, fontVariants } = useFontSelection()
+const { navigationHaptic } = useNavigationHaptics()
 const host = useTemplateRef('host')
 const trigger = useTemplateRef('trigger')
 const menu = useTemplateRef('menu')
 const open = ref(false)
 const menuId = useId()
 
-function choose(id: FontVariantId) {
+function selectStyle(id: FontVariantId) {
+  if (selectedFont.value === id) return
   selectedFont.value = id
+  navigationHaptic()
+}
+
+function choose(id: FontVariantId) {
+  selectStyle(id)
   open.value = false
   trigger.value?.focus()
 }
@@ -65,7 +72,7 @@ onBeforeUnmount(() => {
 <template>
   <div ref="host" class="font-selector" :style="{ '--selector-duration': `${motionSystem.enter / 4}s` }" @focusout="focusout">
     <div class="font-selector__desktop" role="group" aria-label="Font style">
-      <button v-for="font in fontVariants" :key="font.id" type="button" class="font-selector__button" :aria-pressed="selectedFont === font.id" :style="{ fontWeight: font.weight, fontStyle: font.style }" @click="selectedFont = font.id">{{ font.label }}</button>
+      <button v-for="font in fontVariants" :key="font.id" type="button" class="font-selector__button" :aria-pressed="selectedFont === font.id" :style="{ fontWeight: font.weight, fontStyle: font.style }" @click="selectStyle(font.id)">{{ font.label }}</button>
     </div>
     <div class="font-selector__mobile">
       <button ref="trigger" type="button" class="font-selector__button font-selector__trigger" :aria-expanded="open" :aria-controls="menuId" :aria-label="`Font style: ${activeFont.label}`" :style="{ fontWeight: activeFont.weight, fontStyle: activeFont.style }" @click="toggle">

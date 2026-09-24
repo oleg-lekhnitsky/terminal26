@@ -26,6 +26,7 @@ function advanceWord() {
   <figure class="motion-pin">
     <div
       class="motion-pin__art"
+      :class="{ 'motion-pin__art--poster': preset.id === 'poster' }"
       :style="{
         backgroundColor: preset.background,
         color: preset.color,
@@ -56,6 +57,10 @@ function advanceWord() {
         @cycle-complete="advanceWord"
         loop
       />
+      <template v-if="preset.id === 'poster'">
+        <div class="motion-pin__micro motion-pin__micro--top"><span>AB TERMINAL</span><span>TYPE STUDY</span></div>
+        <div class="motion-pin__micro motion-pin__micro--bottom"><span>{{ specimenFont.label }}</span><span>LATIN / CYRILLIC</span></div>
+      </template>
     </div>
     <figcaption>{{ preset.name }}</figcaption>
   </figure>
@@ -70,6 +75,8 @@ function advanceWord() {
     position: relative;
     overflow: hidden;
     border-radius: var(--radius-xl);
+    // Clip the composited WebGL surface explicitly, including inside Firefox columns.
+    clip-path: inset(0 round var(--radius-xl));
     isolation: isolate;
   }
 
@@ -77,6 +84,23 @@ function advanceWord() {
     position: absolute;
     inset: 0;
     --webgl-text-height: 100%;
+  }
+
+  &__art--poster { container-type: inline-size; }
+  &__micro {
+    position: absolute;
+    inset-inline: 8%;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: var(--font-sans);
+    font-size: clamp(10px, 2.5cqw, 13px);
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.3;
+    pointer-events: none;
+    &--top { top: 6%; }
+    &--bottom { bottom: 6%; }
   }
 
   figcaption {

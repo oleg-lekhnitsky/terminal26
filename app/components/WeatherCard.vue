@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { navigationHaptic } = useNavigationHaptics()
 import { motionSystem, typographySystem } from '~/utils/textRenderer'
 import { weatherPalette, type CityWeather } from '~/utils/cityWeather'
 import { weatherSky, type WeatherSky } from '~/utils/weatherSky'
@@ -115,8 +116,8 @@ onBeforeUnmount(() => {
         </div>
       </Transition>
       <template v-if="current && (data?.length ?? 0) > 1">
-        <button class="weather-pin__nav weather-pin__nav--previous" type="button" aria-label="Previous weather city" @click="changeCity(-1)" />
-        <button class="weather-pin__nav weather-pin__nav--next" type="button" aria-label="Next weather city" @click="changeCity(1)" />
+        <button class="weather-pin__nav weather-pin__nav--previous" type="button" aria-label="Previous weather city" @click="changeCity(-1); navigationHaptic()" />
+        <button class="weather-pin__nav weather-pin__nav--next" type="button" aria-label="Next weather city" @click="changeCity(1); navigationHaptic()" />
       </template>
     </div>
     <figcaption><span>Weather</span><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo ↗</a></figcaption>

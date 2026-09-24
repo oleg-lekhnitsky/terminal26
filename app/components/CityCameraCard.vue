@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { navigationHaptic } = useNavigationHaptics()
 import type Hls from 'hls.js'
 import { motionSystem, typographySystem } from '~/utils/textRenderer'
 
@@ -168,8 +169,8 @@ onBeforeUnmount(() => {
       <div class="camera-pin__type" :style="{ fontSize: `${Math.min(28, 110 / city.name.length)}cqw` }">{{ city.name }}</div>
       <button v-if="needsPlay" class="camera-pin__play" type="button" @click="play">Play live camera</button>
       <div class="camera-pin__location">{{ city.location }}<br>{{ city.country }}</div>
-      <button class="camera-pin__nav camera-pin__nav--previous" type="button" aria-label="Previous camera" @click="nextCity(-1)" />
-      <button class="camera-pin__nav camera-pin__nav--next" type="button" aria-label="Next camera" @click="nextCity(1)" />
+      <button class="camera-pin__nav camera-pin__nav--previous" type="button" aria-label="Previous camera" @click="nextCity(-1); navigationHaptic()" />
+      <button class="camera-pin__nav camera-pin__nav--next" type="button" aria-label="Next camera" @click="nextCity(1); navigationHaptic()" />
     </div>
     <figcaption><span>Street type</span><a :href="city.source" target="_blank" rel="noopener noreferrer">{{ city.credit }} ↗</a></figcaption>
   </figure>

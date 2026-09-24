@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { navigationHaptic } = useNavigationHaptics()
 const { activeFont } = useFontSelection()
 const host = useTemplateRef('host')
 const index = ref(0)
@@ -6,7 +7,7 @@ const scenes = [
   { id: 'pool', label: 'Pool', alt: 'Two swimmers in turquoise water, photographed from above with flash glints.' },
   { id: 'office', label: 'Office', alt: 'A late-night desk with a telephone, keyboard and chrome lamp, lit by direct flash.' },
   { id: 'tennis', label: 'Tennis', alt: 'A racket and bright tennis balls on a dark green court at dusk.' },
-  { id: 'sunset', label: 'Sunset', alt: 'An orange ocean sunset above a flash-lit seaside ledge.' },
+  { id: 'bar', label: 'Bar', alt: 'Cocktail glasses on a dark red bar counter, with hard flash reflections.' },
   { id: 'coffee', label: 'Coffee', alt: 'Espresso on a stainless steel cafe table, with hard flash reflections.' },
 ] as const
 const scene = computed(() => scenes[index.value]!)
@@ -33,7 +34,7 @@ function preload(id: string) {
 function sync() {
   clearTimeout(timer)
   if (disposed || !visible || document.hidden || hover || focused || reduced?.matches) return
-  timer = setTimeout(() => { void change(1) }, 8000)
+  timer = setTimeout(() => { void change(1) }, 3000)
 }
 async function change(direction: number) {
   clearTimeout(timer)
@@ -81,11 +82,13 @@ onBeforeUnmount(() => {
       <div class="photo-pin__shade" aria-hidden="true" />
       <span class="photo-pin__number">/{{ String(index + 1).padStart(2, '0') }}</span>
       <Transition name="photo-word" mode="out-in">
-        <span :key="scene.id" class="photo-pin__word" :style="{ fontSize: typeSize }">{{ scene.label }}</span>
+        <span :key="scene.id" class="photo-pin__word" :style="{ fontSize: typeSize }" :aria-label="scene.label">
+          <span aria-hidden="true"><span v-for="(letter, letterIndex) in scene.label" :key="letterIndex" class="photo-pin__letter" :style="{ '--letter-delay': `${letterIndex * 35}ms` }">{{ letter }}</span></span>
+        </span>
       </Transition>
       <div class="photo-pin__footer"><span>AB Terminal</span><span>{{ activeFont.label }} / Flash studies</span></div>
-      <button class="photo-pin__nav photo-pin__nav--prev" type="button" aria-label="Previous photo" @click="change(-1)" />
-      <button class="photo-pin__nav photo-pin__nav--next" type="button" aria-label="Next photo" @click="change(1)" />
+      <button class="photo-pin__nav photo-pin__nav--prev" type="button" aria-label="Previous photo" @click="change(-1); navigationHaptic()" />
+      <button class="photo-pin__nav photo-pin__nav--next" type="button" aria-label="Next photo" @click="change(1); navigationHaptic()" />
       <span v-if="failed" class="photo-pin__error" role="status">Photo couldn’t load. Try again.</span>
     </div>
     <figcaption>Flash studies</figcaption>
@@ -104,6 +107,7 @@ onBeforeUnmount(() => {
   &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 33%; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; }
   &__nav::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .16s ease; }
   @media (hover: hover) { &__nav:hover::after { opacity: 1; } }
+  &__nav:active::after { opacity: 1; }
   &__nav--prev { left: 0; } &__nav--next { right: 0; }
   &__nav--prev::after { background: linear-gradient(90deg, #0003, transparent); }
   &__nav--next::after { background: linear-gradient(-90deg, #0003, transparent); }
@@ -113,9 +117,16 @@ onBeforeUnmount(() => {
 }
 .photo-fade-enter-active, .photo-fade-leave-active { transition: opacity .8s var(--ease-flow); }
 .photo-fade-enter-from, .photo-fade-leave-to { opacity: 0; }
-.photo-word-enter-active, .photo-word-leave-active { transition: opacity .2s ease; }
-.photo-word-enter-from, .photo-word-leave-to { opacity: 0; }
+// Keep the transition root alive until the last letter finishes its fade.
+.photo-pin__letter { display: inline-block; }
+.photo-word-enter-active, .photo-word-leave-active { transition: opacity .4s ease; }
+.photo-word-enter-active .photo-pin__letter,
+.photo-word-leave-active .photo-pin__letter { transition: opacity .22s ease var(--letter-delay), transform .22s var(--ease-flow) var(--letter-delay); }
+.photo-word-enter-from .photo-pin__letter { opacity: 0; transform: translateY(10px); }
+.photo-word-leave-to .photo-pin__letter { opacity: 0; transform: translateY(-6px); }
 @media (prefers-reduced-motion: reduce) {
   .photo-fade-enter-active, .photo-fade-leave-active, .photo-word-enter-active, .photo-word-leave-active, .photo-pin__nav::after { transition: none; }
+  .photo-word-enter-active .photo-pin__letter, .photo-word-leave-active .photo-pin__letter { transition: none; }
+  .photo-word-enter-from .photo-pin__letter, .photo-word-leave-to .photo-pin__letter { transform: none; }
 }
 </style>

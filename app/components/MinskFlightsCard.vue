@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { navigationHaptic } = useNavigationHaptics()
 import { motionSystem, typographySystem } from '~/utils/textRenderer'
 import type { MinskDepartures } from '~/utils/minskFlights'
 
@@ -120,8 +121,8 @@ onBeforeUnmount(() => {
       </div>
       <div v-else class="flights-pin__empty"><p>{{ error ? 'Departures unavailable' : data ? 'No upcoming departures' : 'Checking departures…' }}</p><button v-if="error" type="button" @click="refresh">Try again</button></div>
       <template v-if="flight && pageCount > 1">
-        <button class="flights-pin__nav flights-pin__nav--previous" type="button" aria-label="Previous departure" @click="changeFlight(-1)" />
-        <button class="flights-pin__nav flights-pin__nav--next" type="button" aria-label="Next departure" @click="changeFlight(1)" />
+        <button class="flights-pin__nav flights-pin__nav--previous" type="button" aria-label="Previous departure" @click="changeFlight(-1); navigationHaptic()" />
+        <button class="flights-pin__nav flights-pin__nav--next" type="button" aria-label="Next departure" @click="changeFlight(1); navigationHaptic()" />
       </template>
     </div>
     <p v-if="error && data" class="flights-pin__notice" role="status">Update unavailable</p>

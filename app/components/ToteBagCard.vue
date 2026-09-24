@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { navigationHaptic } = useNavigationHaptics()
 const { activeFont } = useFontSelection()
 const host = useTemplateRef('host')
 const drawing = useTemplateRef<SVGSVGElement>('drawing')
@@ -14,7 +15,7 @@ const index = ref(0)
 const bags = [
   { name: 'BIG TYPE', subtitle: 'The oversized shopper', detail: 'Wide gusset / Double handles', number: '01', background: '#2535f5', ink: '#f5f1df', shape: 'shopper' },
   { name: 'DAILY TYPE', subtitle: 'The everyday tote', detail: 'Flat canvas / Long handles', number: '02', background: '#c8b9e6', ink: '#38264d', shape: 'canvas' },
-  { name: 'TYPE TO GO', subtitle: 'The compact carrier', detail: 'Box bottom / Short handles', number: '03', background: '#a9c8d8', ink: '#183746', shape: 'compact' },
+  { name: 'TYPE TO GO', subtitle: 'The compact carrier', detail: 'Box bottom / Short handles', number: '03', background: '#d5ef72', ink: '#263219', shape: 'compact' },
   { name: 'SOFT TYPE', subtitle: 'The foldaway shopper', detail: 'Soft body / Integrated handles', number: '04', background: '#dd705f', ink: '#401d23', shape: 'reusable' },
   { name: 'TYPE AROUND', subtitle: 'The crescent shoulder bag', detail: 'Curved body / Adjustable strap', number: '05', background: '#1c5149', ink: '#e9e7d8', shape: 'crescent' },
 ] as const
@@ -98,8 +99,8 @@ onBeforeUnmount(() => {
         </svg>
       </Transition>
       <div class="tote-pin__footer" aria-hidden="true"><span>LETTERS TO CARRY.</span><span>TYPE GOODS</span></div>
-      <button class="tote-pin__nav tote-pin__nav--prev" type="button" aria-label="Previous tote bag" @click="change(-1)" />
-      <button class="tote-pin__nav tote-pin__nav--next" type="button" aria-label="Next tote bag" @click="change(1)" />
+      <button class="tote-pin__nav tote-pin__nav--prev" type="button" aria-label="Previous tote bag" @click="change(-1); navigationHaptic()" />
+      <button class="tote-pin__nav tote-pin__nav--next" type="button" aria-label="Next tote bag" @click="change(1); navigationHaptic()" />
     </div>
     <figcaption>Type carrier</figcaption>
   </figure>
@@ -116,6 +117,7 @@ onBeforeUnmount(() => {
   &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 30%; border: 0; background: transparent; cursor: pointer; padding: 0; }
   &__nav::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .16s ease; pointer-events: none; }
   @media (hover: hover) { &__nav:hover::after { opacity: 1; } }
+  &__nav:active::after { opacity: 1; }
   &__nav--prev { left: 0; } &__nav--next { right: 0; }
   &__nav--prev::after { background: linear-gradient(90deg, #ffffff14, transparent); }
   &__nav--next::after { background: linear-gradient(-90deg, #ffffff14, transparent); }

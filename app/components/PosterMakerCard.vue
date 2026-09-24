@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { navigationHaptic } = useNavigationHaptics()
 import { touchPair, pinchTransform } from '~/utils/posterTouch'
 import { snapAxis, snapRotation } from '~/utils/posterSnapping'
 import { hasPosterContent } from '~/utils/posterContent'
@@ -286,10 +287,12 @@ let galleryHovered = false
 let galleryFocused = false
 let galleryMotion: MediaQueryList | undefined
 let galleryTimer: ReturnType<typeof setTimeout> | undefined
+const addHintPlaying = ref(false)
 let preloadedPoster = ''
 function syncGalleryPlayback() {
   clearTimeout(galleryTimer)
-  if (disposed || !galleryVisible || studioOpen.value || galleryHovered || galleryFocused || document.hidden || galleryMotion?.matches || posters.value.length < 2) return
+  addHintPlaying.value = !disposed && galleryVisible && !studioOpen.value && !galleryHovered && !galleryFocused && !document.hidden && !galleryMotion?.matches
+  if (!addHintPlaying.value || posters.value.length < 2) return
   const next = posters.value[(slide.value + 1) % posters.value.length]
   if (next && next.url !== preloadedPoster) {
     preloadedPoster = next.url
@@ -297,7 +300,7 @@ function syncGalleryPlayback() {
     image.src = next.url
     void image.decode().catch(() => {})
   }
-  galleryTimer = setTimeout(() => changeSlide(1), 5000)
+  galleryTimer = setTimeout(() => changeSlide(1), 3000)
 }
 function setGalleryHover(value: boolean) { galleryHovered = value; syncGalleryPlayback() }
 function galleryFocus(event: FocusEvent) {
@@ -509,11 +512,11 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
         <button v-if="galleryError" type="button" @click="loadGallery()">Retry</button>
       </div>
       <template v-if="posters.length > 1">
-        <button class="poster-maker__previous" type="button" aria-label="Previous slide" @click="changeSlide(-1)"></button>
-        <button class="poster-maker__next" type="button" aria-label="Next slide" @click="changeSlide(1)"></button>
+        <button class="poster-maker__previous" type="button" aria-label="Previous slide" @click="changeSlide(-1); navigationHaptic()"></button>
+        <button class="poster-maker__next" type="button" aria-label="Next slide" @click="changeSlide(1); navigationHaptic()"></button>
       </template>
       <span v-if="posters.length" class="poster-maker__count" aria-live="polite">{{ slide + 1 }} / {{ posters.length }}</span>
-      <button type="button" class="poster-maker__add" aria-label="Create your poster" title="Create your poster" @click="openStudio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" class="poster-maker__add" :class="{ 'is-hinting': addHintPlaying }" aria-label="Create your poster" title="Create your poster" @click="openStudio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <div v-show="studioOpen" class="poster-maker__art" :style="{ color: '#ffffff' }">
       <canvas ref="canvas" width="960" height="1200" role="img" aria-label="Poster background" @pointerdown="finishEditing" />
@@ -593,6 +596,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__empty { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 8cqw; text-align: center; font-size: 4cqw; }
   &__add { position: absolute; bottom: 5cqw; left: 50%; transform: translateX(-50%); display: grid; place-items: center; width: 52px; height: 44px; padding: 0; border-radius: var(--radius-full); background: #eeeae3 !important; color: #29252b !important; box-shadow: 0 2px 8px #00000018; }
   &__add:hover { background: #fff !important; }
+  &__add.is-hinting { animation: poster-add-hint 12s ease-in-out infinite; }
   &__add svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
   &__published { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
   &__previous, &__next { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 30%; padding: 0; background: transparent; }
@@ -602,7 +606,8 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__previous::after { background: linear-gradient(90deg, #00000014, transparent); }
   &__next::after { background: linear-gradient(-90deg, #00000014, transparent); }
   @media (hover: hover) { &__previous:hover::after, &__next:hover::after { opacity: 1; } }
-  &__previous:focus-visible::after, &__next:focus-visible::after { opacity: 1; }
+  &__previous:focus-visible::after, &__next:focus-visible::after,
+  &__previous:active::after, &__next:active::after { opacity: 1; }
   @media (prefers-reduced-motion: reduce) { &__previous::after, &__next::after { transition: none; } }
   &__count { position: absolute; top: 5cqw; left: 50%; transform: translateX(-50%); padding: .3rem .6rem; border-radius: var(--radius-full); background: #eeeae330; color: #ffffffb3; font-size: 2.5cqw; pointer-events: none; }
   &__art { container-type: inline-size; position: relative; isolation: isolate; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--radius-xl); background: #b4869d; }
@@ -711,7 +716,16 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
 
 .poster-slide-enter-active, .poster-slide-leave-active { transition: opacity .8s ease; }
 .poster-slide-enter-from, .poster-slide-leave-to { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .poster-slide-enter-active, .poster-slide-leave-active { transition: none; } }
+@keyframes poster-add-hint {
+  0%, 92%, 100% { transform: translateX(-50%) scale(1) rotate(0); }
+  94% { transform: translateX(-50%) scale(1.07) rotate(-4deg); }
+  96% { transform: translateX(-50%) scale(1.07) rotate(4deg); }
+  98% { transform: translateX(-50%) scale(1.03) rotate(-2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster-slide-enter-active, .poster-slide-leave-active { transition: none; }
+  .poster-maker__add.is-hinting { animation: none; }
+}
 .poster-gallery {
   width: min(42rem, calc(100vw - 2rem)); max-height: 85dvh; border: 0; padding: 0; border-radius: 1.5rem; background: #eeeae3; color: #29252b; font-family: var(--font-sans);
   &::backdrop { background: #000a; }

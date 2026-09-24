@@ -2,6 +2,7 @@
 import { motionSystem } from '~/utils/textRenderer'
 
 const host = useTemplateRef('host')
+const filterId = useId()
 const pulse = ref(0)
 const playing = ref(false)
 let visible = false
@@ -19,7 +20,6 @@ const colors = computed(() => ({
   '--rim': `hsl(${hue.value + 51} 97% 68%)`,
   '--halo': `hsl(${hue.value - 34} 98% 80%)`,
   '--core': `hsl(${hue.value - 5} 75% 57%)`,
-  '--core-clear': `hsl(${hue.value - 5} 75% 57% / 0)`,
   '--button': `hsl(${hue.value - 5} 66% 44% / .42)`,
   '--color-duration': `${motionSystem.enter}s`,
   '--pulse-duration': `${motionSystem.enter * 2}s`,
@@ -32,11 +32,19 @@ const colors = computed(() => ({
 <template>
   <figure ref="host" class="gradient-pin">
     <div class="gradient-pin__art" :style="colors">
-      <div class="gradient-pin__field" aria-hidden="true">
-        <div class="gradient-pin__rim" />
-        <div class="gradient-pin__halo" />
-        <div class="gradient-pin__core" />
-      </div>
+      <svg class="gradient-pin__field" viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <!-- Explicit padding keeps the blur bounds outside the visible field. -->
+          <filter v-for="[name, deviation] in [['rim', 24], ['halo', 20], ['core', 80]]"
+            :id="`${filterId}-${name}`" :key="name" filterUnits="userSpaceOnUse"
+            x="-300" y="-300" width="1600" height="1400" color-interpolation-filters="sRGB">
+            <feGaussianBlur :stdDeviation="deviation" />
+          </filter>
+        </defs>
+        <rect class="gradient-pin__rim" x="100" y="72" width="800" height="656" rx="256" ry="210" :filter="`url(#${filterId}-rim)`" />
+        <rect class="gradient-pin__halo" x="124" y="91.68" width="752" height="616.64" rx="240.64" ry="197.32" :filter="`url(#${filterId}-halo)`" />
+        <rect class="gradient-pin__core" x="220" y="170.4" width="560" height="459.2" rx="224" ry="183.68" :filter="`url(#${filterId}-core)`" />
+      </svg>
       <span v-if="pulse" :key="pulse" class="gradient-pin__pulse" aria-hidden="true" />
       <button type="button" class="gradient-pin__button" aria-label="Change hue and pulse" @click="pulse++">Breathe</button>
     </div>
@@ -62,25 +70,28 @@ const colors = computed(() => ({
   }
   &__field {
     position: absolute;
-    inset: 9% 10%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform-origin: center;
     pointer-events: none;
     animation: gradient-breathe var(--breath-duration) var(--ease-flow) infinite;
     animation-play-state: var(--play-state);
   }
   &__rim, &__halo, &__core {
-    position: absolute;
-    border-radius: 32%;
-    transition: background-color var(--color-duration) var(--ease-flow);
+    transition: fill var(--color-duration) var(--ease-flow);
   }
-  &__rim { inset: 0; background: var(--rim); filter: blur(2.4cqw); }
-  &__halo { inset: 3%; background: var(--halo); filter: blur(2cqw); }
-  &__core { inset: 15%; background: var(--core); filter: blur(8cqw); border-radius: 40%; }
+  &__rim { fill: var(--rim); }
+  &__halo { fill: var(--halo); }
+  &__core { fill: var(--core); }
   &__pulse {
     position: absolute;
-    inline-size: 48cqw;
-    block-size: 32cqw;
-    // Fade inside the layer bounds so Safari cannot clip an expanding blur surface.
-    background: radial-gradient(ellipse closest-side, var(--core) 0%, var(--core-clear) 100%);
+    inline-size: 24cqw;
+    block-size: 9cqw;
+    border-radius: 999px;
+    background: var(--core);
+    filter: blur(3cqw);
     pointer-events: none;
     animation: gradient-pulse var(--pulse-duration) var(--ease-flow) both;
   }
@@ -116,7 +127,7 @@ const colors = computed(() => ({
 }
 @keyframes gradient-pulse {
   from { transform: scale(1); opacity: .65; }
-  to { transform: scale(2, 1.7); opacity: 0; }
+  to { transform: scale(4, 6); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gradient-pin__art, .gradient-pin__button, .gradient-pin__rim, .gradient-pin__halo, .gradient-pin__core { transition: none; }

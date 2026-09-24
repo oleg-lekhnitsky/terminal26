@@ -55,7 +55,9 @@ const endTime = () => renderer?.duration(duration.value, stagger.value, props.pr
 
 function draw() {
   const still = motion?.matches ?? false
-  const frame = isContinuousPreset(props.preset)
+  const frame = props.preset === 'poster'
+    ? { time: props.loop ? time % (endTime() + motionSystem.hold + motionSystem.exit + motionSystem.rest) : Math.min(time, (endTime() + duration.value) / 2), opacity: 1 }
+    : isContinuousPreset(props.preset)
     ? { time, opacity: 1 }
     : sequenceFrame(time, endTime(), props.loop)
   renderer?.draw(still ? endTime() : frame.time, duration.value, stagger.value, props.preset, still ? 1 : frame.opacity, still)

@@ -46,7 +46,7 @@ export const motionProfiles = {
   fan: { duration: 2, stagger: 1 },
   words: { duration: 1, stagger: 1 },
   numbers: { duration: 0.5, stagger: 1 },
-  poster: { duration: 2, stagger: 2 },
+  poster: { duration: 1, stagger: 2 },
   collage: { duration: 2, stagger: 1 },
 } as const
 
@@ -227,6 +227,15 @@ export function carousel18Pose(time: number, index: number, count: number, durat
     scale: carousel18.cameraDistance / (carousel18.cameraDistance + Math.abs(centered) * carousel18.depth),
     visible: Math.abs(centered) <= (carousel18.visibleCount - 1) / 2,
   }
+}
+
+export function posterLinePose(time: number, index: number, duration: number, stagger: number, count: number) {
+  const elapsed = time - index * stagger
+  const enterDuration = Math.max(0.1, duration)
+  const enter = flow(elapsed / enterDuration)
+  const exitStart = duration + Math.max(0, count - 1) * stagger + motionSystem.hold
+  const exit = flow((time - exitStart - index * stagger) / motionSystem.exit)
+  return { y: (1 - enter - exit) * motionSystem.travel, opacity: enter * (1 - exit) }
 }
 
 export function letterPose(time: number, index: number, duration: number, stagger: number, preset: TextPreset = 'rise', count = 1) {
@@ -450,6 +459,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         })
       },
       duration(duration: number, stagger: number, preset: TextPreset) {
+        if (preset === 'poster') return duration + Math.max(0, letters.length - 1) * stagger * 2
         if (preset === 'collage') return 4 * (Math.max(0.1, duration) * 4 + motionSystem.hold)
         if (preset === 'typewriter') return Math.max(duration, letters.length * Math.max(motionSystem.stagger / 2, stagger))
         if (preset === 'letter') return Math.max(1, letters.length) * oneShotSystem.duration / oneShotSystem.slots
@@ -528,6 +538,11 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
             const offset = still ? 0 : (stepProgress(time, duration) % 1) * pitch
             const copies = Math.ceil(canvas.width / Math.max(pitch, 1)) + 1
             for (let copy = -1; copy <= copies; copy++) render(letter, letter.x - offset + copy * pitch, letter.y, 1, 0, 1)
+            return
+          }
+          if (preset === 'poster') {
+            const pose = still ? { y: 0, opacity: 1 } : posterLinePose(time, index, duration, stagger, letters.length)
+            render(letter, letter.x, letter.y + fontSize * pose.y, 1, 0, pose.opacity)
             return
           }
           const pose = letterPose(time, index, duration, stagger, preset, letters.length)
