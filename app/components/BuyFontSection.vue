@@ -28,7 +28,7 @@ function openShop() {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
         <h2 :id="`${id}-title`">Make it yours.</h2>
-        <p class="buy-font__intro">AB Terminal · Choose your fonts</p>
+        <p class="buy-font__intro">AB Terminal · For personal and commercial use</p>
         <fieldset :disabled="checkingOut" class="buy-font__options">
           <legend class="sr-only">Font style or full pack</legend>
           <label v-for="option in options" :key="option.id" class="buy-font__option" :class="{ 'is-selected': selected === option.id }">
@@ -38,6 +38,7 @@ function openShop() {
           </label>
         </fieldset>
         <p v-if="checkoutError" class="buy-font__error" role="alert">{{ checkoutError }}</p>
+        <p class="buy-font__license">Desktop, web, and apps included. Unlimited projects.<br />By checking out, you agree to the <a href="/license" target="_blank" rel="noopener">font license</a>.</p>
         <button class="buy-font__checkout" type="button" :disabled="checkingOut" :aria-busy="checkingOut" @click="checkout">
           {{ checkingOut ? 'Opening checkout…' : `Checkout · $${product.price}` }}
         </button>
@@ -91,6 +92,8 @@ function openShop() {
     @media (hover: hover) { &:hover:not(:disabled) { background: #403d37; } }
   }
   &__note { margin: 12px 0 0; font-size: 11px; text-align: center; }
+  &__license { margin: 20px 0 0; font-size: 12px; line-height: 1.6; }
+  &__license a { color: inherit; text-underline-offset: 3px; }
   &__error { margin: 16px 0 0; font-size: 13px; line-height: 1.5; }
   &__close {
     position: absolute; top: 12px; right: 12px; display: grid; place-items: center;

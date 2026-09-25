@@ -99,6 +99,7 @@ function changeStyle(direction: number) {
           <p>THANK YOU FOR YOUR TYPE.</p>
         </div>
         <p v-if="checkoutError" role="alert">{{ checkoutError }}</p>
+        <p class="price-cart__license">Personal and commercial use. Desktop, web, and apps included. By checking out, you agree to the <a href="/license" target="_blank" rel="noopener">font license</a>.</p>
         <button class="price-cart__continue" type="button" :disabled="checkingOut || !cart.length" @click="checkout">{{
           checkingOut ? 'Opening checkout…' : `Checkout · ${money(total)}` }}</button>
         <p class="price-cart__secure">Secure checkout with Stripe</p>
@@ -445,6 +446,9 @@ function changeStyle(direction: number) {
     font-size: .65rem;
     margin: .8rem 0 0;
   }
+
+  &__license { font-size: .75rem; line-height: 1.5; }
+  &__license a { color: inherit; text-underline-offset: 3px; }
 
   &__downloads {
     display: block;

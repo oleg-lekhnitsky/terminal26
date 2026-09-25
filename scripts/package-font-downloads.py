@@ -10,10 +10,12 @@ styles = {'regular': 'Regular', 'italic': 'Italic', 'bold': 'Bold', 'bold-italic
 products = {key: [style] for key, style in styles.items()}
 products['full-pack'] = list(styles.values())
 products['test-font'] = ['Regular']
+license_text = (root / 'public/AB-Terminal-License.txt').read_text()
 for product, included in products.items():
     with ZipFile(target / f'{product}.zip', 'w', ZIP_DEFLATED) as archive:
         for style in included:
             name = f'AB_Terminal-{style}.ttf'
             archive.write(source / name, name)
         archive.writestr('INSTALL.txt', 'AB TERMINAL\n\nOpen each TTF file to install the font on your computer.\n')
+        archive.writestr('LICENSE.txt', license_text)
 print(f'Packaged {len(products)} font downloads.')

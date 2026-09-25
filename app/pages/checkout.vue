@@ -54,6 +54,7 @@ async function download(item: { id: string; url: string }) {
       </button>
       <p v-if="downloadError" role="alert">{{ downloadError }}</p>
       <NuxtLink :to="data.restoreUrl" replace>Save this download link</NuxtLink>
+      <NuxtLink to="/license">Font license</NuxtLink>
     </div>
     <button v-if="!data?.paid" :disabled="status === 'pending'" @click="refresh()">Check payment status</button>
     <section v-if="savedOrders.length && !data?.paid">
