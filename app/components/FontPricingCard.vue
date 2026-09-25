@@ -9,7 +9,7 @@ const product = computed(() => fontProducts.find(item => item.id === selected.va
 const cart = useState<FontProductId[]>('font-cart', () => [])
 const cartProducts = computed(() => fontProducts.filter(item => cart.value.includes(item.id)))
 const total = computed(() => cartProducts.value.reduce((sum, item) => sum + item.price, 0))
-const included = computed(() => cart.value.includes(product.value.id) || (product.value.id !== 'test-font' && cart.value.includes('full-pack')))
+const included = computed(() => cart.value.includes(product.value.id) || cart.value.includes('full-pack'))
 const dialog = useTemplateRef('dialog')
 const money = (value: number) => `$${value}`
 const { checkingOut, checkoutError, checkout } = useFontCheckout(() => cart.value)

@@ -4,7 +4,7 @@ import { fontProducts, type FontProductId } from '~/utils/fontShop'
 const { activeFont } = useFontSelection()
 const shop = useTemplateRef('shop')
 const id = useId()
-const options = fontProducts.filter(product => product.id !== 'test-font')
+const options = fontProducts
 const selected = ref<FontProductId>(activeFont.value.id)
 const product = computed(() => options.find(option => option.id === selected.value)!)
 const { checkingOut, checkoutError, checkout } = useFontCheckout(() => [selected.value])
@@ -65,6 +65,7 @@ defineExpose({ openShop })
     @media (hover: hover) { &:hover { color: #f2df64; } }
     &:active { scale: .96; }
     &:focus-visible { outline: 2px solid #eeeae3; outline-offset: 4px; }
+    @media (max-width: 600px) { border-radius: 48px; }
   }
   &__shop {
     width: min(28rem, calc(100vw - 2rem)); max-height: 90dvh;

@@ -21,9 +21,7 @@ test('full pack replaces individual checkout items', () => {
   assert.equal(params.get('metadata[font_ids]'), 'full-pack')
 })
 
-test('test font checkout uses exactly 100 USD cents', () => {
-  const params = checkoutParameters(['test-font'], 'https://example.com')
-  assert.equal(params.get('line_items[0][price_data][unit_amount]'), '100')
-  assert.equal(params.get('line_items[0][price_data][currency]'), 'usd')
-  assert.equal(params.get('metadata[font_ids]'), 'test-font')
+test('retired test font cannot be purchased alone or with other fonts', () => {
+  assert.throws(() => checkoutParameters(['test-font'], 'https://example.com'))
+  assert.throws(() => checkoutParameters(['bold', 'test-font'], 'https://example.com'))
 })

@@ -532,7 +532,8 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
             const frame = itemFrame(time, duration, preset === 'words' ? wordTiming : motionSystem)
             const active = frame.index % Math.max(1, letters.length)
             if (index !== (still ? 0 : active)) return
-            render(letter, canvas.width / 2 + letter.centerOffset, letter.y + (still ? 0 : frame.offset * fontSize), 1, 0, still ? 1 : frame.opacity)
+            const travel = preset === 'words' ? 0.5 : 1
+            render(letter, canvas.width / 2 + letter.centerOffset, letter.y + (still ? 0 : frame.offset * fontSize * travel), 1, 0, still ? 1 : frame.opacity)
             return
           }
           if (preset === 'carousel') {

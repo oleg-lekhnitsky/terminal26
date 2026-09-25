@@ -12,7 +12,14 @@ export interface PaidSession {
 }
 export function purchasedFonts(session: PaidSession) {
   if (session.mode !== 'payment' || session.payment_status !== 'paid') return []
-  const products = checkoutProducts(session.metadata?.font_ids?.split(','))
+  const ids = session.metadata?.font_ids?.split(',')
+  const currentIds = ids?.filter(id => id !== 'test-font')
+  // Honor paid historical orders without making the retired test product purchasable.
+  const products = [
+    ...(currentIds?.length ? checkoutProducts(currentIds) : []),
+    ...(ids?.includes('test-font') ? [{ id: 'test-font', label: 'Test font', price: 1 }] : []),
+  ]
+  if (!products.length) throw new Error('Order contains no font products.')
   if (session.currency !== 'usd' || session.amount_total !== products.reduce((sum, product) => sum + product.price * 100, 0)) {
     throw new Error('Order amount does not match the font products.')
   }

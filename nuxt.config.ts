@@ -9,6 +9,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
+    public: {
+      siteUrl: 'https://terminal26.vercel.app',
+    },
     stripeSecretKey: '',
     fontDownloadSecret: '',
     siteUrl: 'http://localhost:3000',

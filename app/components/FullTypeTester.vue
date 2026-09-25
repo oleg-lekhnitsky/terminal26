@@ -8,6 +8,18 @@ const defaultText = 'Type here.\nMake it yours.'
 const text = ref(defaultText)
 const caps = ref(false)
 const size = ref(50)
+const sizeAdjusted = ref(false)
+function syncDefaultSize() {
+  if (sizeAdjusted.value) return
+  size.value = window.innerWidth > 760
+    ? Math.round(Math.min(128, Math.max(32, window.innerWidth * .07)))
+    : 50
+}
+onMounted(() => {
+  syncDefaultSize()
+  window.addEventListener('resize', syncDefaultSize)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', syncDefaultSize))
 const tracking = ref(-.02)
 const leading = ref(1.05)
 const alignment = ref<'left' | 'center' | 'right'>('left')
@@ -29,7 +41,7 @@ const appearance = computed(() => ({
     <div class="type-tester__controls">
       <label class="type-tester__range">
         <span>Size <output>{{ size }} px</output></span>
-        <input v-model.number="size" type="range" min="16" max="240" step="1" :aria-valuetext="`${size} pixels`" />
+        <input v-model.number="size" type="range" min="16" max="240" step="1" :aria-valuetext="`${size} pixels`" @input="sizeAdjusted = true" />
       </label>
       <label class="type-tester__range">
         <span>Letter spacing <output>{{ trackingLabel }}</output></span>

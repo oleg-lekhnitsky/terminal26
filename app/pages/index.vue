@@ -10,6 +10,31 @@ import { textPresets } from '~/utils/textRenderer'
 import { galleryLayouts, galleryCardStyle, type GalleryCardId } from '~/utils/galleryLayout'
 import type { Component } from 'vue'
 
+const siteUrl = useRuntimeConfig().public.siteUrl.replace(/\/$/, '')
+const pageTitle = 'AB Terminal — Typeface by Alex Blohin'
+const description = 'A pixel typeface by Alex Blohin. Explore four styles, try your own text, and use AB Terminal in personal and commercial projects across desktop, web, and apps.'
+useSeoMeta({
+  title: pageTitle,
+  description,
+  author: 'Alex Blohin',
+  ogTitle: pageTitle,
+  ogDescription: description,
+  ogType: 'website',
+  ogSiteName: 'AB Terminal',
+  ogUrl: `${siteUrl}/`,
+  ogImage: `${siteUrl}/og/ab-terminal.png`,
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
+  ogImageType: 'image/png',
+  ogImageAlt: 'AB Terminal in its bold pixel typeface on black, with the credit typeface by Alex Blohin.',
+  twitterCard: 'summary_large_image',
+  twitterTitle: pageTitle,
+  twitterDescription: description,
+  twitterImage: `${siteUrl}/og/ab-terminal.png`,
+  twitterImageAlt: 'AB Terminal — typeface by Alex Blohin',
+})
+useHead({ link: [{ rel: 'canonical', href: `${siteUrl}/` }] })
+
 const { activeFont } = useFontSelection()
 const board = useTemplateRef('board')
 const buySection = useTemplateRef('buySection')
