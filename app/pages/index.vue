@@ -16,7 +16,7 @@ const description = 'A pixel typeface by Alex Blohin. Explore four styles, try y
 useSeoMeta({
   title: pageTitle,
   description,
-  author: 'Alex Blohin',
+  author: 'Oleg Lekhnitsky',
   ogTitle: pageTitle,
   ogDescription: description,
   ogType: 'website',
