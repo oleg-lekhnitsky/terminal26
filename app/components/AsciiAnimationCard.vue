@@ -194,7 +194,8 @@ onBeforeUnmount(() => {
 <template>
   <figure ref="host" class="ascii-pin">
     <div class="ascii-pin__art">
-      <canvas ref="canvas" role="img" aria-label="A galloping horse formed from ASCII characters">A galloping horse formed from ASCII characters.</canvas>
+      <canvas ref="canvas" role="img" aria-label="A galloping horse formed from ASCII characters">A galloping horse
+        formed from ASCII characters.</canvas>
     </div>
     <figcaption>ASCII gallop</figcaption>
   </figure>
@@ -204,8 +205,24 @@ onBeforeUnmount(() => {
 .ascii-pin {
   margin: 0 0 var(--space-6);
   break-inside: avoid;
-  &__art { aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-xl); background: #b8d2ca; }
-  canvas { display: block; width: 100%; height: 100%; }
-  figcaption { padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
+
+  &__art {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: #daf759;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  figcaption {
+    padding: var(--space-3) var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
 }
 </style>

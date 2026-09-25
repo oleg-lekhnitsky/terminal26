@@ -440,7 +440,7 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
   context.fillStyle = '#ffffff'
   context.font = '400 20px "AB Terminal"'
   context.textAlign = 'center'
-  context.fillText(`AB TERMINAL · ${activeFont.value.label}`, width / 2, 1000)
+  context.fillText(`AB TERMINAL · ${activeFont.value.label}`, width / 2, 920)
 }
 watch([title, ink, backgroundColor, currentTextFont, alignment, lineHeight, typeSize, textWidth, textBoxHeight, allCaps], () => { void paint() })
 async function posterBlob() {
@@ -578,7 +578,10 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
     <figcaption>Poster studio</figcaption>
     <dialog ref="gallery" class="poster-gallery" aria-labelledby="poster-gallery-title" @click.self="gallery?.close()">
       <div class="poster-gallery__inner">
-        <header><h2 id="poster-gallery-title">Made by you</h2><button type="button" @click="gallery?.close()">Close</button></header>
+        <button class="poster-gallery__close" type="button" aria-label="Close gallery" @click="gallery?.close()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        </button>
+        <h2 id="poster-gallery-title">Community posters</h2>
         <p v-if="galleryError" role="status">{{ galleryError }}</p>
         <p v-else-if="!posters.length">{{ galleryLoading ? 'Loading posters…' : 'The next poster could be yours.' }}</p>
         <div v-else class="poster-gallery__grid"><a v-for="poster in posters" :key="poster.id" :href="poster.url" target="_blank" rel="noopener noreferrer"><img :src="poster.url" width="960" height="1200" loading="lazy" decoding="async" alt="Open a community poster"></a></div>
@@ -594,10 +597,18 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   margin: 0 0 var(--space-6); break-inside: avoid; font-family: var(--font-sans);
   &__slides { container-type: inline-size; position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--radius-xl); background: #eeeae3; color: #29252b; }
   &__empty { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 8cqw; text-align: center; font-size: 4cqw; }
-  &__add { position: absolute; bottom: 5cqw; left: 50%; transform: translateX(-50%); display: grid; place-items: center; width: 52px; height: 44px; padding: 0; border-radius: var(--radius-full); background: #eeeae3 !important; color: #29252b !important; box-shadow: 0 2px 8px #00000018; }
-  &__add:hover { background: #fff !important; }
-  &__add.is-hinting { animation: poster-add-hint 12s ease-in-out infinite; }
-  &__add svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+  &__add {
+    position: absolute; z-index: 2; bottom: 5cqw; left: 50%; transform: translateX(-50%);
+    display: grid; place-items: center; width: 64px; height: 64px; padding: 0;
+    border-radius: var(--radius-full); background: #f1d58a !important; color: #24221f !important;
+    box-shadow: 0 0 0 1px #00000014, 0 2px 4px #00000024, 0 8px 24px #00000038;
+    transition: background-color 150ms ease, box-shadow 150ms ease, scale 150ms ease;
+  }
+  &__add:hover { background: #ffe5a2 !important; box-shadow: 0 0 0 1px #00000014, 0 3px 6px #00000024, 0 10px 28px #00000045; }
+  &__add:active { scale: .96; }
+  button.poster-maker__add:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+  &__add.is-hinting { animation: poster-add-hint 3s ease-in-out infinite; }
+  &__add svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
   &__published { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
   &__previous, &__next { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: absolute; top: 0; bottom: 0; width: 30%; padding: 0; background: transparent; }
   &__previous { left: 0; }
@@ -717,23 +728,32 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
 .poster-slide-enter-active, .poster-slide-leave-active { transition: opacity .8s ease; }
 .poster-slide-enter-from, .poster-slide-leave-to { opacity: 0; }
 @keyframes poster-add-hint {
-  0%, 92%, 100% { transform: translateX(-50%) scale(1) rotate(0); }
-  94% { transform: translateX(-50%) scale(1.07) rotate(-4deg); }
-  96% { transform: translateX(-50%) scale(1.07) rotate(4deg); }
-  98% { transform: translateX(-50%) scale(1.03) rotate(-2deg); }
+  0%, 80%, 100% { transform: translateX(-50%) translateY(0) scale(1) rotate(0); }
+  85% { transform: translateX(-50%) translateY(-5px) scale(1.14) rotate(-10deg); }
+  90% { transform: translateX(-50%) translateY(-5px) scale(1.14) rotate(10deg); }
+  95% { transform: translateX(-50%) translateY(-2px) scale(1.07) rotate(-5deg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .poster-slide-enter-active, .poster-slide-leave-active { transition: none; }
   .poster-maker__add.is-hinting { animation: none; }
+  .poster-maker__add { transition: none; }
 }
 .poster-gallery {
-  width: min(42rem, calc(100vw - 2rem)); max-height: 85dvh; border: 0; padding: 0; border-radius: 1.5rem; background: #eeeae3; color: #29252b; font-family: var(--font-sans);
-  &::backdrop { background: #000a; }
-  &__inner { padding: 1.5rem; }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
-  h2 { margin: 0; font-size: 1.2rem; }
+  width: min(56rem, calc(100vw - 2rem)); max-height: 85dvh; border: 0; padding: 0; background: transparent; color: #eeeae3; font-family: var(--font-sans);
+  overflow-y: auto; scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  &::backdrop { background: #000e; }
+  &__inner { position: relative; padding: 4px; }
+  h2 { margin: 0 56px 1.5rem 0; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 400; line-height: 1.2; }
   button { min-height: 44px; font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
+  &__close { position: absolute; top: 0; right: 0; width: 44px; display: grid; place-items: center; border-radius: 50%; }
+  &__close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+  @media (hover: hover) { button:hover { color: #f2df64; } }
+  :is(button, a):focus-visible { outline: 2px solid #f2df64; outline-offset: 2px; }
   &__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
   img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+  @media (max-width: 480px) {
+    &__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+  }
 }
 </style>

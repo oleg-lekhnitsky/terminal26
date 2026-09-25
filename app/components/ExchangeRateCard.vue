@@ -43,7 +43,8 @@ onBeforeUnmount(() => {
       <template v-if="data">
         <p class="exchange-pin__from">1 USD</p>
         <div class="exchange-pin__reading">
-          <p class="exchange-pin__rate" :style="{ fontSize: `${Math.min(24, 130 / (rate?.length || 6))}cqw` }">{{ rate }}</p>
+          <p class="exchange-pin__rate" :style="{ fontSize: `${Math.min(24, 130 / (rate?.length || 6))}cqw` }">{{ rate
+            }}</p>
           <p class="exchange-pin__currency">BYN</p>
         </div>
         <div class="exchange-pin__details">
@@ -56,25 +57,113 @@ onBeforeUnmount(() => {
         <button v-if="error" type="button" :disabled="status === 'pending'" @click="refresh">Try again</button>
       </div>
     </div>
-    <figcaption><span>Exchange rate</span><a href="https://www.nbrb.by/statistics/rates/ratesdaily" target="_blank" rel="noopener noreferrer">NBRB ↗</a></figcaption>
+    <figcaption><span>Exchange rate</span><a href="https://www.nbrb.by/statistics/rates/ratesdaily" target="_blank"
+        rel="noopener noreferrer">NBRB ↗</a></figcaption>
   </figure>
 </template>
 
 <style scoped lang="scss">
 .exchange-pin {
-  margin: 0 0 var(--space-6); break-inside: avoid;
-  &__art { position: relative; container-type: inline-size; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius-xl); background: #c9cbc2; color: #414d83; text-align: center; font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); letter-spacing: var(--exchange-tracking); }
-  p { margin: 0; }
-  &__from { position: absolute; top: 7cqw; inset-inline: 5cqw; font-size: 8cqw; line-height: 1.1; }
-  &__reading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4cqw; }
-  &__rate { line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  &__currency { font-size: 8cqw; line-height: 1; }
-  &__details { position: absolute; bottom: 7cqw; inset-inline: 5cqw; font-size: 3cqw; line-height: 1.65; }
-  &__empty { position: absolute; inset: 0; display: grid; place-content: center; gap: var(--space-3); font-size: 4cqw; }
-  button { font: inherit; color: inherit; padding: .5em 1em; border: 1px solid currentColor; border-radius: 999px; background: transparent; cursor: pointer; }
-  button:active { transform: scale(.96); }
-  button:disabled { opacity: .5; cursor: wait; }
-  figcaption { display: flex; justify-content: space-between; align-items: baseline; padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
-  a { color: inherit; font-size: .75em; text-underline-offset: .2em; }
+  margin: 0 0 var(--space-6);
+  break-inside: avoid;
+
+  &__art {
+    position: relative;
+    container-type: inline-size;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: #03963e;
+    color: #b10f76;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-weight: var(--specimen-weight, 700);
+    font-style: var(--specimen-style, normal);
+    letter-spacing: var(--exchange-tracking);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &__from {
+    position: absolute;
+    top: 7cqw;
+    inset-inline: 5cqw;
+    font-size: 8cqw;
+    line-height: 1.1;
+  }
+
+  &__reading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4cqw;
+  }
+
+  &__rate {
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__currency {
+    font-size: 8cqw;
+    line-height: 1;
+  }
+
+  &__details {
+    position: absolute;
+    bottom: 7cqw;
+    inset-inline: 5cqw;
+    font-size: 3cqw;
+    line-height: 1.65;
+  }
+
+  &__empty {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: var(--space-3);
+    font-size: 4cqw;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    padding: .5em 1em;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  button:active {
+    transform: scale(.96);
+  }
+
+  button:disabled {
+    opacity: .5;
+    cursor: wait;
+  }
+
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: var(--space-3) var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  a {
+    color: inherit;
+    font-size: .75em;
+    text-underline-offset: .2em;
+  }
 }
 </style>

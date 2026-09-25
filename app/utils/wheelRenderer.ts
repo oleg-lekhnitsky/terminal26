@@ -26,7 +26,20 @@ export function createWheelScene() {
   const planeWidth = 1, planeHeight = 1.25
   const twist = THREE.MathUtils.degToRad(wheelPreset.planeRotation)
   const anchoredRadius = (Math.abs(Math.cos(twist)) * planeWidth + Math.abs(Math.sin(twist)) * planeHeight) / 2
-  const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight)
+  const radius = wheelPreset.cornerRadius
+  const halfWidth = planeWidth / 2, halfHeight = planeHeight / 2
+  const outline = new THREE.Shape()
+  outline.absarc(halfWidth - radius, -halfHeight + radius, radius, -Math.PI / 2, 0, false)
+  outline.absarc(halfWidth - radius, halfHeight - radius, radius, 0, Math.PI / 2, false)
+  outline.absarc(-halfWidth + radius, halfHeight - radius, radius, Math.PI / 2, Math.PI, false)
+  outline.absarc(-halfWidth + radius, -halfHeight + radius, radius, Math.PI, Math.PI * 1.5, false)
+  outline.closePath()
+  const geometry = new THREE.ShapeGeometry(outline, 8)
+  // ShapeGeometry uses world coordinates for UVs; preserve the full poster mapping.
+  const vertices = geometry.getAttribute('position'), uvs = geometry.getAttribute('uv')
+  for (let i = 0; i < vertices.count; i++) {
+    uvs.setXY(i, (vertices.getX(i) + halfWidth) / planeWidth, (vertices.getY(i) + halfHeight) / planeHeight)
+  }
   const planes = wheelPosters.map((_, index) => {
     const angle = index / wheelPreset.count * Math.PI * 2
     const material = new THREE.MeshStandardMaterial({
@@ -36,22 +49,15 @@ export function createWheelScene() {
       // gl_FrontFacing true on both sides and leaking mirrored artwork.
       forceSinglePass: true,
     })
-    // Art-directed world-space light cutoff: the upper stack stays in darkness.
+    // Let the fixed spotlight shade the entire orbit, including the upper stack.
+    // Only the unprinted reverse is black; printed faces retain spatial falloff.
     material.onBeforeCompile = (shader) => {
-      shader.uniforms.wheelLightFadeStart = { value: wheelPreset.lightFadeStartY }
-      shader.uniforms.wheelLightFadeEnd = { value: wheelPreset.lightFadeEndY }
-      shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', '#include <common>\nvarying float vWheelWorldY;')
-        .replace('#include <project_vertex>', '#include <project_vertex>\nvWheelWorldY = (modelMatrix * vec4(transformed, 1.0)).y;')
       shader.fragmentShader = shader.fragmentShader
-        .replace('#include <common>', '#include <common>\nvarying float vWheelWorldY;\nuniform float wheelLightFadeStart;\nuniform float wheelLightFadeEnd;')
         .replace('#include <opaque_fragment>', `
-          float wheelLightMask = 1.0 - smoothstep(wheelLightFadeStart, wheelLightFadeEnd, vWheelWorldY);
-          outgoingLight *= wheelLightMask;
           if (!gl_FrontFacing) outgoingLight = vec3(0.0);
           #include <opaque_fragment>`)
     }
-    material.customProgramCacheKey = () => 'wheel-black-reverse-world-light-v2'
+    material.customProgramCacheKey = () => 'wheel-black-reverse-spotlight-v3'
     const plane = new THREE.Mesh(geometry, material)
     plane.position.set(Math.cos(angle) * anchoredRadius, 0, Math.sin(angle) * anchoredRadius)
     ring.add(plane)
@@ -74,8 +80,8 @@ export function createWheelScene() {
       view.copy(camera.position).sub(position)
       // Source applies in-plane twist toward the currently visible side.
       plane.rotateZ(twist * (normal.dot(view) < 0 ? -1 : 1))
-      // Present the print without reflecting its UVs. Darkness above comes from
-      // the world-space light mask, not whichever side happens to face us.
+      // Present the print without reflecting its UVs. Lighting follows the
+      // surface angle to the fixed spotlight throughout the orbit.
       if (normal.dot(view) < 0) plane.rotateY(Math.PI)
       // A half-turn in the poster's own plane preserves its silhouette and side,
       // but stops the printed front being presented upside down.

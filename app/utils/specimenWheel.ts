@@ -1,12 +1,11 @@
 import { flow } from './textRenderer.ts'
 
 export const wheelPreset = Object.freeze({
-  count: 18, planeSize: 380, planeRotation: 90, orbitRadius: 0,
+  count: 18, planeSize: 380, planeRotation: 90, orbitRadius: 0, cornerRadius: .045,
   distance: 900, perspective: 150, rotationX: 90, rotationY: -90, rotationZ: 0,
-  duration: 8.5, lightX: -1.8, lightY: 1.6, lightZ: -3,
-  lightTargetY: -.15, lightAngle: 28, lightPenumbra: 1,
-  lightFadeStartY: -.3, lightFadeEndY: .08,
-  hemisphereIntensity: .04, keyIntensity: 4, roughness: .78, fade: .01,
+  duration: 8.5, lightX: -.2, lightY: .3, lightZ: -2.8,
+  lightTargetY: 0, lightAngle: 32, lightPenumbra: 1,
+  hemisphereIntensity: .2, keyIntensity: 3.2, roughness: .85, fade: .01,
 })
 
 export const wheelPosters = [

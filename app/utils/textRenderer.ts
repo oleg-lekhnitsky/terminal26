@@ -25,6 +25,9 @@ export const motionSystem = Object.freeze({
   tilt: 0.12,
 })
 
+// Quicker word changes retain the same fully visible reading time.
+const wordTiming = { hold: motionSystem.hold, exit: 0.2, rest: 0.04 }
+
 export const typographySystem = Object.freeze({
   fontFamily: '"AB Terminal", sans-serif',
   fontWeight: 700,
@@ -47,16 +50,16 @@ export const motionProfiles = {
   typewriter: { duration: 0.5, stagger: 0.5 },
   slide: { duration: 4, stagger: 1 },
   fan: { duration: 2, stagger: 1 },
-  words: { duration: 1, stagger: 1 },
+  words: { duration: 0.5, stagger: 1 },
   numbers: { duration: 0.5, stagger: 1 },
   poster: { duration: 1, stagger: 2 },
   collage: { duration: 2, stagger: 1 },
 } as const
 
 export const textPresets = ([
-  { id: 'rise', name: 'Rise', text: 'AB', background: '#ede9e1', color: '#24221f', aspectRatio: '22 / 22' },
-  { id: 'letter', name: 'One at a time', text: oneShotText('bold'), background: '#d5ef72', color: '#263219', aspectRatio: '22 / 31' },
-  { id: 'carousel', name: 'Carousel', text: 'Hello!', background: '#c8b9eb', color: '#38214a', aspectRatio: '22 / 23' },
+  { id: 'rise', name: 'Rise', text: 'Hello{', background: '#ede9e1', color: '#24221f', aspectRatio: '22 / 12' },
+  { id: 'letter', name: 'One at a time', text: oneShotText('bold'), background: '#d5ef72', color: '#263219', aspectRatio: '22 / 28' },
+  { id: 'carousel', name: 'Flip flop', text: '"|', background: '#038249', color: '#7c15cc', aspectRatio: '22 / 23' },
   { id: 'drop', name: 'Drop', text: 'Латиница', background: '#ed754e', color: '#421f18', aspectRatio: '22 / 8' },
   { id: 'typewriter', name: 'Typewriter', text: '$20', background: '#252e48', color: '#f0e9d9', aspectRatio: '22 / 24' },
   { id: 'slide', name: 'On repeat', text: 'I opened this file to fix one tiny thing. Three hours later, the letters have a new font, the cube has opinions, and I have forgotten what the tiny thing was. Anyway, look at that spacing.', background: '#b7d3cb', color: '#173d35', aspectRatio: '22 / 16' },
@@ -189,14 +192,14 @@ export function oneShotIndex(time: number, count: number) {
   return Math.floor(Math.max(0, time) * oneShotSystem.slots / oneShotSystem.duration) % count
 }
 
-export function itemFrame(time: number, duration: number) {
+export function itemFrame(time: number, duration: number, timing: { hold: number; exit: number; rest: number } = motionSystem) {
   const enterDuration = Math.max(0.1, duration)
-  const cycle = enterDuration + motionSystem.hold + motionSystem.exit + motionSystem.rest
+  const cycle = enterDuration + timing.hold + timing.exit + timing.rest
   const elapsed = time / cycle
   const index = Math.floor(elapsed)
   const phase = (elapsed - index) * cycle
   const enter = flow(phase / enterDuration)
-  const exit = flow((phase - enterDuration - motionSystem.hold) / motionSystem.exit)
+  const exit = flow((phase - enterDuration - timing.hold) / timing.exit)
   return { index, offset: (1 - enter - exit) * motionSystem.travel, opacity: enter * (1 - exit) }
 }
 
@@ -440,6 +443,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         const bounds = graphemes.map(letter => context.measureText(letter))
         const lineAdvance = multiline ? fontSize * (poster ? (appearance.lineHeight ?? 0.85) : 1.35) : 0
         const baseline = centeredTextBaseline(canvas.height, bounds, lineAdvance)
+          - (appearance.preset === 'rise' ? canvas.height * 0.04 : 0)
         const runs = graphemes.flatMap((line, index) => {
           if (!poster || !appearance.staggerByWords) return [{ letter: line, index, offset: 0 }]
           return Array.from(line.matchAll(/\S+/g), match => ({
@@ -473,7 +477,10 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         if (preset === 'collage') return 4 * (Math.max(0.1, duration) * 4 + motionSystem.hold)
         if (preset === 'typewriter') return Math.max(duration, letters.length * Math.max(motionSystem.stagger / 2, stagger))
         if (preset === 'letter') return Math.max(1, letters.length) * oneShotSystem.duration / oneShotSystem.slots
-        if (preset === 'words' || preset === 'numbers') return Math.max(1, letters.length) * (duration + motionSystem.hold + motionSystem.exit + motionSystem.rest)
+        if (preset === 'words' || preset === 'numbers') {
+          const timing = preset === 'words' ? wordTiming : motionSystem
+          return Math.max(1, letters.length) * (duration + timing.hold + timing.exit + timing.rest)
+        }
         if (preset === 'carousel') return Math.max(1, letters.length) * duration
         if (preset === 'fan') return Math.max(1, letters.length) * (duration + motionSystem.hold)
         if (preset === 'slide') return duration + motionSystem.hold
@@ -522,7 +529,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
             return
           }
           if (preset === 'words' || preset === 'numbers') {
-            const frame = itemFrame(time, duration)
+            const frame = itemFrame(time, duration, preset === 'words' ? wordTiming : motionSystem)
             const active = frame.index % Math.max(1, letters.length)
             if (index !== (still ? 0 : active)) return
             render(letter, canvas.width / 2 + letter.centerOffset, letter.y + (still ? 0 : frame.offset * fontSize), 1, 0, still ? 1 : frame.opacity)

@@ -33,7 +33,7 @@ function advanceWord() {
         aspectRatio: preset.aspectRatio,
       }"
     >
-      <Carousel3dText
+      <FlipFlopText
         v-if="preset.id === 'carousel'"
         class="motion-pin__specimen"
         :text="specimenText"

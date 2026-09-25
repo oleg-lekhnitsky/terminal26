@@ -36,7 +36,7 @@ function nextAlphabet() { alphabetIndex.value = (alphabetIndex.value + 1) % alph
     overflow: hidden;
     border-radius: var(--radius-xl);
     clip-path: inset(0 round var(--radius-xl));
-    background: #f0bed0;
+    background: #f652e3;
     color: #642a46;
   }
   &__letters { position: absolute; inset: 0; --webgl-text-height: 100%; }

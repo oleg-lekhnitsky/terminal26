@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { createFrameGate, renderBudget } from '~/utils/renderBudget'
 import { typographySystem } from '~/utils/textRenderer'
-import type { createWheelRenderer } from '~/utils/wheelRenderer'
+import type { createFlipFlopRenderer } from '~/utils/flipFlopRenderer'
 
+const props = defineProps<{ text: string; color: string; background: string }>()
 const { activeFont } = useFontSelection()
 const host = useTemplateRef('host')
 const canvas = useTemplateRef('canvas')
 const ready = ref(false)
-let renderer: ReturnType<typeof createWheelRenderer> | undefined
+let renderer: ReturnType<typeof createFlipFlopRenderer> | undefined
 let observer: IntersectionObserver | undefined
 let resize: ResizeObserver | undefined
 let motion: MediaQueryList | undefined
@@ -47,19 +48,19 @@ async function loadFont() {
   } catch { /* Keep the available fallback font. */ }
   if (disposed || request !== fontRequest || !renderer) return
   renderer.updateFont({
-    text: 'AB TERMINAL Aa', fontFamily: typographySystem.fontFamily,
+    text: props.text, fontFamily: typographySystem.fontFamily,
     fontWeight: font.weight, fontStyle: font.style,
-    letterSpacing: typographySystem.letterSpacing, color: '#242522',
-  })
+    letterSpacing: typographySystem.letterSpacing, color: props.color,
+  }, props.background)
   ready.value = true
   syncPlayback()
 }
 async function initialize() {
   if (!canvas.value || disposed) return
   try {
-    const { createWheelRenderer } = await import('~/utils/wheelRenderer')
+    const { createFlipFlopRenderer } = await import('~/utils/flipFlopRenderer')
     if (disposed || !canvas.value) return
-    renderer = createWheelRenderer(canvas.value)
+    renderer = createFlipFlopRenderer(canvas.value)
     await loadFont()
   } catch {
     renderer?.dispose()
@@ -90,7 +91,7 @@ onMounted(() => {
   }
   initialize()
 })
-watch(activeFont, loadFont)
+watch([activeFont, () => props.text, () => props.color, () => props.background], loadFont)
 onBeforeUnmount(() => {
   disposed = true
   stop()
@@ -105,52 +106,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <figure ref="host" class="wheel-pin">
-    <div class="wheel-pin__art" role="img" :aria-label="`Carousel 3D 07: rotating AB Terminal posters, ${activeFont.label}`">
-      <span v-if="!ready" class="wheel-pin__fallback">AB<br>TERMINAL<br>Aa</span>
-      <canvas ref="canvas" aria-hidden="true" :class="{ 'is-ready': ready }" />
-    </div>
-    <figcaption>Specimen wheel</figcaption>
-  </figure>
+  <div ref="host" class="flip-flop" role="img" :aria-label="`${text}: flipping uppercase letters, ${activeFont.label}`">
+    <span v-if="!ready" class="flip-flop__fallback">{{ text.toUpperCase() }}</span>
+    <canvas ref="canvas" aria-hidden="true" :class="{ 'is-ready': ready }" />
+  </div>
 </template>
 
 <style scoped lang="scss">
-.wheel-pin {
-  margin: 0 0 var(--space-6);
-  break-inside: avoid;
-  &__art {
-    position: relative;
-    container-type: inline-size;
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(180deg, #030607 10%, #23314b 65%, #505d76 100%);
-  }
-  canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    &.is-ready { opacity: 1; }
-  }
-  &__fallback {
-    position: absolute;
-    inset: 15%;
-    display: grid;
-    place-content: center;
-    text-align: center;
-    color: #f3eedf;
-    font-family: var(--font-sans);
-    font-weight: var(--specimen-weight, 700);
-    font-style: var(--specimen-style, normal);
-    font-size: 10cqw;
-  }
-  figcaption {
-    padding: var(--space-3) var(--space-2) 0;
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--color-text);
-  }
+.flip-flop {
+  width: 100%; height: 100%; position: relative;
+  canvas { display: block; width: 100%; height: 100%; opacity: 0; }
+  canvas.is-ready { opacity: 1; }
+  &__fallback { position: absolute; inset: 0; display: grid; place-content: center; font-size: 12cqw; }
 }
 </style>
