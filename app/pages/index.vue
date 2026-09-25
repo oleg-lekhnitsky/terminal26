@@ -32,8 +32,8 @@ useSeoMeta({
   twitterDescription: description,
   twitterImage: `${siteUrl}/og/ab-terminal.png`,
   twitterImageAlt: 'AB Terminal — typeface by Alex Blohin',
-})
-useHead({ link: [{ rel: 'canonical', href: `${siteUrl}/` }] })
+}, { tagPriority: 15 })
+useHead({ link: [{ rel: 'canonical', href: `${siteUrl}/`, tagPriority: 15 }] })
 
 const { activeFont } = useFontSelection()
 const board = useTemplateRef('board')
