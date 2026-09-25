@@ -3,7 +3,7 @@
   src: url('../fonts/AB_Terminal-Regular.ttf') format('truetype');
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   src: url('../fonts/AB_Terminal-Italic.ttf') format('truetype');
   font-style: italic;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   src: url('../fonts/AB_Terminal-Bold.ttf') format('truetype');
   font-style: normal;
   font-weight: 700;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
@@ -27,6 +27,5 @@
   src: url('../fonts/AB_Terminal-Bold-Italic.ttf') format('truetype');
   font-style: italic;
   font-weight: 700;
-  font-display: swap;
+  font-display: block;
 }
-

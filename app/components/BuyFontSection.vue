@@ -15,6 +15,7 @@ function openShop() {
   }
   shop.value?.showModal()
 }
+defineExpose({ openShop })
 </script>
 
 <template>

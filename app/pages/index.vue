@@ -12,6 +12,7 @@ import type { Component } from 'vue'
 
 const { activeFont } = useFontSelection()
 const board = useTemplateRef('board')
+const buySection = useTemplateRef('buySection')
 const catalogue: Record<string, { component: Component; props?: Record<string, unknown> }> = {
   ...Object.fromEntries(textPresets
     .filter(preset => !['fan', 'typewriter'].includes(preset.id))
@@ -64,6 +65,14 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="home-page" :style="{ '--specimen-weight': activeFont.weight, '--specimen-style': activeFont.style }">
+    <header class="home-hero">
+      <img class="home-hero__avatar" src="/favicon/frame-0.png" width="40" height="40" alt="Alex Blohin" />
+      <button class="home-hero__buy" type="button" aria-haspopup="dialog" @click="buySection?.openShop()">Buy</button>
+      <div class="home-hero__content">
+        <h1>AB Terminal</h1>
+        <p>typeface by Alex Blohin</p>
+      </div>
+    </header>
     <div ref="board" class="motion-board">
       <div v-for="card in cards" :key="card.id" class="motion-board__item" :data-card="card.id" :style="card.style">
         <div class="motion-board__content">
@@ -71,13 +80,50 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-    <FullTypeTester />
-    <BuyFontSection />
+    <FullTypeTester class="home-page__section" />
+    <BuyFontSection ref="buySection" class="home-page__section" />
   </main>
   <FontStyleSelector />
 </template>
 
 <style scoped lang="scss">
+.home-hero {
+  position: relative;
+  width: 100%; min-width: 0;
+  min-height: 50svh;
+  display: grid; place-items: center;
+  // padding: var(--space-8);
+  text-align: center;
+
+  &__avatar {
+    position: absolute; top: 0; left: 0;
+    width: 40px; height: 40px; object-fit: cover;
+  }
+  &__buy {
+    position: absolute; top: 0; right: 0;
+    min-height: 44px; padding: 10px 24px; border: 0; border-radius: var(--radius-full);
+    background: #eeeae3; color: #24221f; font: 400 13px var(--font-sans); cursor: pointer;
+    font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
+    transition: background-color 150ms ease, scale 150ms ease;
+    @media (hover: hover) { &:hover { background: #f2df64; } }
+    &:active { scale: .96; }
+    &:focus-visible { outline: 2px solid #f2df64; outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { transition: none; }
+  }
+  &__content { display: grid; gap: var(--space-4); }
+  p {
+    margin: 0; color: var(--color-text); font-family: var(--font-sans);
+    font-size: 13px; font-weight: 400; font-style: normal; opacity: .6;
+  }
+
+  h1 {
+    margin: 0; color: var(--color-text); font-family: var(--font-sans);
+    font-size: clamp(36px, 11vw, 180px); line-height: 1.1;
+    font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
+    letter-spacing: -.04em;
+  }
+}
+
 .motion-board {
   inline-size: 100%;
   display: grid;
@@ -117,7 +163,7 @@ onBeforeUnmount(() => {
   min-width: 0;
   min-height: 100dvh;
   display: grid;
-  row-gap: clamp(var(--space-24), 10vw, 10rem);
+  row-gap: 0;
   position: relative;
   container-type: inline-size;
   background-position: -4px -4px;
@@ -131,5 +177,7 @@ onBeforeUnmount(() => {
     opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
+
+  &__section { margin-top: clamp(var(--space-24), 10vw, 10rem); }
 }
 </style>
