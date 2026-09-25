@@ -1,10 +1,13 @@
 <script setup lang="ts">
 const { activeFont } = useFontSelection()
 const id = useId()
+const editor = useTemplateRef('editor')
+const editing = ref(false)
+useKeyboardReveal(editor, editing)
 const defaultText = 'Type here.\nMake it yours.'
 const text = ref(defaultText)
 const caps = ref(false)
-const size = ref(120)
+const size = ref(50)
 const tracking = ref(-.02)
 const leading = ref(1.05)
 const alignment = ref<'left' | 'center' | 'right'>('left')
@@ -54,7 +57,7 @@ const appearance = computed(() => ({
       <span>Click or tap the text to edit</span>
     </div>
 
-    <textarea v-model="text" class="type-tester__text" :style="appearance" aria-label="Text to preview" placeholder="Type here…" spellcheck="false" />
+    <textarea ref="editor" v-model="text" @focus="editing = true" @blur="editing = false" class="type-tester__text" :style="appearance" aria-label="Text to preview" placeholder="Type here…" spellcheck="false" />
   </section>
 </template>
 

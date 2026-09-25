@@ -15,6 +15,7 @@ const backgroundColor = ref('#b4869d')
 const backgroundPickerOpen = ref(false)
 const spacingOpen = ref(false)
 watch(editing, () => { spacingOpen.value = false; backgroundPickerOpen.value = false })
+useKeyboardReveal(textEditor, editing)
 function cycleAlignment() {
   const options = ['left', 'center', 'right'] as const
   alignment.value = options[(options.indexOf(alignment.value) + 1) % options.length]!
@@ -548,7 +549,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
       <div v-if="snapGuides.x !== null" class="poster-maker__guide poster-maker__guide--vertical" :style="{ left: `${Math.max(.1, Math.min(99.9, snapGuides.x / 9.6))}%` }" aria-hidden="true"/>
       <div v-if="snapGuides.y !== null" class="poster-maker__guide poster-maker__guide--horizontal" :style="{ top: `${Math.max(.1, Math.min(99.9, snapGuides.y / 12))}%` }" aria-hidden="true"/>
       <span v-if="rotationLabel !== null" class="poster-maker__angle" aria-hidden="true">{{ rotationLabel }}°</span>
-      <span v-if="!hasPhoto && !cameraOpen && !editing" class="poster-maker__hint">{{ hasText || savedTexts.length ? 'Drag to move. Tap to edit.' : 'Tap Aa to add text.' }}</span>
+      <span v-if="!hasPhoto && !cameraOpen && !editing" class="poster-maker__hint" :class="{ 'is-empty': !hasText && !savedTexts.length }">{{ hasText || savedTexts.length ? 'Drag to move. Tap to edit.' : 'Tap Aa to add text.' }}</span>
       <div v-if="!cameraOpen && !editing" class="poster-maker__tools" role="toolbar" aria-label="Poster tools">
         <button type="button" :disabled="cameraStarting" aria-label="Take a photo" title="Camera" @click="openCamera"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6.5 9.5 4.5h5L16 6.5h3A2.5 2.5 0 0 1 21.5 9v9a2.5 2.5 0 0 1-2.5 2.5H5A2.5 2.5 0 0 1 2.5 18V9A2.5 2.5 0 0 1 5 6.5Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></button>
         <button v-if="!hasPhoto" type="button" aria-label="Background color" title="Background color" :aria-expanded="backgroundPickerOpen" @click="backgroundPickerOpen = !backgroundPickerOpen"><span class="poster-maker__background-swatch" :style="{ backgroundColor }"/></button>
@@ -661,8 +662,13 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__guide--vertical { top: 0; bottom: 0; width: 1px; }
   &__guide--horizontal { left: 0; right: 0; height: 1px; }
   &__angle { position: absolute; top: 5cqw; left: 50%; transform: translateX(-50%); z-index: 4; padding: 6px 10px; border-radius: var(--radius-full); background: #29252bcc; color: #fff; font-size: 12px; pointer-events: none; }
-  &__hint { position: absolute; bottom: 22%; inset-inline: 7cqw; text-align: center; font-size: 2.4cqw; font-style: normal; font-weight: 400; opacity: .7; pointer-events: none; }
-  &__tools { position: absolute; bottom: 0; inset-inline: 0; display: flex; justify-content: center; padding: 3cqw 6cqw; border-radius: 0 0 var(--radius-xl) var(--radius-xl); overflow: hidden; background: linear-gradient(transparent, #00000020); }
+  &__hint {
+    position: absolute; top: calc(5cqw + 56px); inset-inline: 7cqw;
+    text-align: center; font-size: max(12px, 2.4cqw); line-height: 1.4;
+    font-style: normal; font-weight: 400; opacity: .85; pointer-events: none;
+    &.is-empty { top: 50%; transform: translateY(-50%); }
+  }
+  &__tools { position: absolute; bottom: 0; inset-inline: 0; display: flex; justify-content: center; padding: 5cqw 7cqw; border-radius: 0 0 var(--radius-xl) var(--radius-xl); overflow: hidden; background: linear-gradient(transparent, #00000020); }
   &__tools button { flex: 1; min-width: 0; height: 44px; display: grid; place-items: center; padding: 0; border-radius: var(--radius-full); }
   &__tools button.poster-maker__publish { flex: 0 0 auto; padding: 0 16px; margin-left: 6px; background: #f1d58a; color: #24221f; font-size: 12px; font-style: normal; font-weight: 400; }
   &__tools button.poster-maker__publish:hover:not(:disabled) { background: #f7dfa3; }
@@ -720,9 +726,8 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   .poster-maker__swatches button { flex-basis: 44px; width: 44px; min-height: 44px; }
   .poster-maker__edit-heading button { min-width: 44px; min-height: 44px; }
   .poster-maker__heading { font-size: max(12px, 2.5cqw); }
-  .poster-maker__tools { padding-inline: 3cqw; }
   .poster-maker__tools button { min-width: 44px; }
-  .poster-maker__tools button.poster-maker__publish { padding-inline: 12px; }
+  .poster-maker__tools button.poster-maker__publish { padding-inline: 8px; }
 }
 
 .poster-slide-enter-active, .poster-slide-leave-active { transition: opacity .8s ease; }

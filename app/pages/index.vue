@@ -72,6 +72,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <FullTypeTester />
+    <BuyFontSection />
   </main>
   <FontStyleSelector />
 </template>

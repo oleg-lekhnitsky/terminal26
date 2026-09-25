@@ -3,6 +3,7 @@ import { fontProducts, addFontToCart, type FontProductId } from '~/utils/fontSho
 import { motionSystem } from '~/utils/textRenderer'
 
 const { activeFont } = useFontSelection()
+const cartTitleId = `${useId()}-font-cart-title`
 const selected = ref<FontProductId>(activeFont.value.id)
 const product = computed(() => fontProducts.find(item => item.id === selected.value)!)
 const cart = useState<FontProductId[]>('font-cart', () => [])
@@ -11,20 +12,7 @@ const total = computed(() => cartProducts.value.reduce((sum, item) => sum + item
 const included = computed(() => cart.value.includes(product.value.id) || (product.value.id !== 'test-font' && cart.value.includes('full-pack')))
 const dialog = useTemplateRef('dialog')
 const money = (value: number) => `$${value}`
-const checkingOut = ref(false)
-const checkoutError = ref('')
-async function checkout() {
-  if (checkingOut.value || !cart.value.length) return
-  checkingOut.value = true
-  checkoutError.value = ''
-  try {
-    const result = await $fetch('/api/checkout', { method: 'POST', body: { items: cart.value } })
-    window.location.assign(result.url)
-  } catch (error: any) {
-    checkoutError.value = error?.data?.statusMessage || 'Could not open checkout. Please try again.'
-    checkingOut.value = false
-  }
-}
+const { checkingOut, checkoutError, checkout } = useFontCheckout(() => cart.value)
 let loaded = false
 watch(activeFont, font => { if (selected.value !== 'full-pack') selected.value = font.id })
 onMounted(() => {
@@ -80,7 +68,7 @@ function changeStyle(direction: number) {
       </div>
     </div>
     <figcaption>Font shop</figcaption>
-    <dialog ref="dialog" class="price-cart" aria-labelledby="font-cart-title" @click.self="dialog?.close()">
+    <dialog ref="dialog" class="price-cart" :aria-labelledby="cartTitleId" @click.self="dialog?.close()">
       <div class="price-cart__inner">
         <button class="price-cart__close" type="button" aria-label="Close cart" @click="dialog?.close()">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -88,7 +76,7 @@ function changeStyle(direction: number) {
           </svg>
         </button>
         <header class="price-cart__heading">
-          <h2 id="font-cart-title">AB TERMINAL</h2>
+          <h2 :id="cartTitleId">AB TERMINAL</h2>
           <p>TYPE FOUNDRY / FONT SHOP</p>
           <span>YOUR CART</span>
         </header>
