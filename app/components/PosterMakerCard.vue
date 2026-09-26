@@ -601,11 +601,11 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__add {
     position: absolute; z-index: 2; bottom: 5cqw; left: 50%; transform: translateX(-50%);
     display: grid; place-items: center; width: 64px; height: 64px; padding: 0;
-    border-radius: var(--radius-full); background: #f1d58a !important; color: #24221f !important;
-    box-shadow: 0 0 0 1px #00000014, 0 2px 4px #00000024, 0 8px 24px #00000038;
+    border-radius: var(--radius-full); background: #daf759 !important; color: #24221f !important;
+    
     transition: background-color 150ms ease, box-shadow 150ms ease, scale 150ms ease;
   }
-  &__add:hover { background: #ffe5a2 !important; box-shadow: 0 0 0 1px #00000014, 0 3px 6px #00000024, 0 10px 28px #00000045; }
+  &__add:hover { background: #ffbd13 !important; box-shadow: 0 0 0 1px #00000014, 0 3px 6px #00000024, 0 10px 28px #00000045; }
   &__add:active { scale: .96; }
   button.poster-maker__add:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
   &__add.is-hinting { animation: poster-add-hint 3s ease-in-out infinite; }
@@ -670,8 +670,8 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   }
   &__tools { position: absolute; bottom: 0; inset-inline: 0; display: flex; justify-content: center; padding: 5cqw 7cqw; border-radius: 0 0 var(--radius-xl) var(--radius-xl); overflow: hidden; background: linear-gradient(transparent, #00000020); }
   &__tools button { flex: 1; min-width: 0; height: 44px; display: grid; place-items: center; padding: 0; border-radius: var(--radius-full); }
-  &__tools button.poster-maker__publish { flex: 0 0 auto; padding: 0 16px; margin-left: 6px; background: #f1d58a; color: #24221f; font-size: 12px; font-style: normal; font-weight: 400; }
-  &__tools button.poster-maker__publish:hover:not(:disabled) { background: #f7dfa3; }
+  &__tools button.poster-maker__publish { flex: 0 0 auto; padding: 0 16px; margin-left: 6px; background: #daf759; color: #24221f; font-size: 12px; font-style: normal; font-weight: 400; }
+  &__tools button.poster-maker__publish:hover:not(:disabled) { background: #daf759; }
   &__tools button:hover:not(:disabled) { background: #ffffff22; }
   &__tools button:disabled { opacity: .3; cursor: default; }
   &__tools svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
@@ -753,8 +753,8 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   button { min-height: 44px; font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
   &__close { position: absolute; top: 0; right: 0; width: 44px; display: grid; place-items: center; border-radius: 50%; }
   &__close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
-  @media (hover: hover) { button:hover { color: #f2df64; } }
-  :is(button, a):focus-visible { outline: 2px solid #f2df64; outline-offset: 2px; }
+  @media (hover: hover) { button:hover { color: #daf759; } }
+  :is(button, a):focus-visible { outline: 2px solid #daf759; outline-offset: 2px; }
   &__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
   img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
   @media (max-width: 480px) {

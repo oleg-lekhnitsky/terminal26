@@ -15,7 +15,7 @@ const index = ref(0)
 const bags = [
   { name: 'BIG TYPE', subtitle: 'The oversized shopper', detail: 'Wide gusset / Double handles', number: '01', background: '#2535f5', ink: '#f5f1df', shape: 'shopper' },
   { name: 'DAILY TYPE', subtitle: 'The everyday tote', detail: 'Flat canvas / Long handles', number: '02', background: '#c8b9e6', ink: '#38264d', shape: 'canvas' },
-  { name: 'TYPE TO GO', subtitle: 'The compact carrier', detail: 'Box bottom / Short handles', number: '03', background: '#d5ef72', ink: '#263219', shape: 'compact' },
+  { name: 'TYPE TO GO', subtitle: 'The compact carrier', detail: 'Box bottom / Short handles', number: '03', background: '#daf759', ink: '#263219', shape: 'compact' },
   { name: 'SOFT TYPE', subtitle: 'The foldaway shopper', detail: 'Soft body / Integrated handles', number: '04', background: '#dd705f', ink: '#401d23', shape: 'reusable' },
   { name: 'TYPE AROUND', subtitle: 'The crescent shoulder bag', detail: 'Curved body / Adjustable strap', number: '05', background: '#1c5149', ink: '#e9e7d8', shape: 'crescent' },
 ] as const

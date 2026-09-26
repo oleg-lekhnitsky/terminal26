@@ -23,7 +23,7 @@ export interface CityWeather {
 
 // Paired background/ink tokens for each sky state, with a darker night variant.
 export const weatherPalettes = {
-  clear: { day: ['#f1d58a', '#473414'], night: ['#202044', '#ded5ff'] },
+  clear: { day: ['#daf759', '#473414'], night: ['#202044', '#ded5ff'] },
   cloud: { day: ['#b9cbd5', '#263b48'], night: ['#303d50', '#d7e4ec'] },
   fog: { day: ['#d1d6cd', '#38433a'], night: ['#3c4845', '#e0e7dd'] },
   rain: { day: ['#8eb5c9', '#153d53'], night: ['#162f46', '#bce0f2'] },
@@ -32,7 +32,7 @@ export const weatherPalettes = {
 } as const
 
 export function weatherPalette(weather?: Pick<CityWeather, 'code' | 'isDay'>) {
-  if (!weather || typeof weather.isDay !== 'boolean') return { background: '#f1d58a', color: '#473414' }
+  if (!weather || typeof weather.isDay !== 'boolean') return { background: '#daf759', color: '#473414' }
   const code = weather.code
   const group = [95, 96, 99].includes(code) ? 'storm'
     : [71, 73, 75, 77, 85, 86].includes(code) ? 'snow'

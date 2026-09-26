@@ -12,3 +12,18 @@ test('invalid or non-USD responses cannot be displayed as a rate', () => {
     assert.throws(() => normalizeUsdRate(value))
   }
 })
+
+test('history is sorted, deduplicated, scaled and limited to the requested dates', async () => {
+  const { normalizeRateHistory } = await import('../app/utils/exchangeRate.ts')
+  const values = normalizeRateHistory([
+    { Date: '2026-09-23T00:00:00', Cur_OfficialRate: 310 },
+    { Date: '2026-09-22T00:00:00', Cur_OfficialRate: 300 },
+    { Date: '2026-09-23T00:00:00', Cur_OfficialRate: 312 },
+    { Date: '2026-08-01T00:00:00', Cur_OfficialRate: 200 },
+    { Date: '2026-09-24T00:00:00', Cur_OfficialRate: -1 },
+    { Date: 'invalid', Cur_OfficialRate: 300 }, null,
+  ], 100, '2026-09-01', '2026-09-23')
+  assert.deepEqual(values, [{ date: '2026-09-22', rate: 3 }, { date: '2026-09-23', rate: 3.12 }])
+  assert.throws(() => normalizeRateHistory({}, 1, '2026-09-01', '2026-09-23'))
+  assert.throws(() => normalizeRateHistory([], 0, '2026-09-01', '2026-09-23'))
+})

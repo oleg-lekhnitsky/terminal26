@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { normalizeMinskFlights } from '../app/utils/minskFlights.ts'
+import { normalizeMinskFlights, destinationAirportCode } from '../app/utils/minskFlights.ts'
 const now = Date.parse('2026-09-23T12:00:00+03:00')
 const flight = { flight_id: '1', flight: 'B2783', airport: { title: 'Istanbul ' }, plan: '2026-09-23T13:00:00+03:00', status: { id: 'empty', title: '' }, numbers_gate: ['B5'] }
 test('normalizes official departures without inventing gate or status updates', () => {
@@ -19,4 +19,18 @@ test('preserves delays and cancellations and sorts by estimated departure', () =
   assert.equal(values[0].status, 'Cancelled')
   assert.equal(values[1].status, 'Delayed')
   assert.equal(values[1].estimated, '2026-09-23T15:00:00+03:00')
+})
+
+test('maps specific airports and preserves ambiguous destination names without guessing', () => {
+  assert.equal(destinationAirportCode(' Moscow (Sheremetyevo) '), 'SVO')
+  assert.equal(destinationAirportCode('Moscow (Domodedovo)'), 'DME')
+  assert.equal(destinationAirportCode('Moscow (Vnukovo)'), 'VKO')
+  assert.equal(destinationAirportCode('Istanbul New Airport'), 'IST')
+  assert.equal(destinationAirportCode('Astana  (Int. Airport) '), 'NQZ')
+  assert.equal(destinationAirportCode('Moscow'), undefined)
+  assert.equal(destinationAirportCode('Istanbul'), undefined)
+  assert.equal(destinationAirportCode('Unknown airport'), undefined)
+  const [value] = normalizeMinskFlights([{ ...flight, airport: { title: 'Moscow (Sheremetyevo)' } }], now)
+  assert.equal(value.destinationCode, 'SVO')
+  assert.equal(value.destination, 'Moscow (Sheremetyevo)')
 })

@@ -104,7 +104,7 @@ export function createCanRenderer(canvas: HTMLCanvasElement) {
       source.width = 2048
       source.height = 1024
       const ctx = source.getContext('2d')!
-      ctx.fillStyle = '#d5ef72'
+      ctx.fillStyle = '#daf759'
       ctx.fillRect(0, 0, source.width, source.height)
       ctx.fillStyle = '#242522'
       ctx.textAlign = 'center'
@@ -120,7 +120,7 @@ export function createCanRenderer(canvas: HTMLCanvasElement) {
       }
       upload(0, source)
       source.width = source.height = 512
-      ctx.fillStyle = '#d5ef72'
+      ctx.fillStyle = '#daf759'
       ctx.fillRect(0, 0, 512, 512)
       upload(1, source)
     },

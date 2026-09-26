@@ -1,7 +1,28 @@
+// Exact destination names from the airport.by feed; codes verified against
+// https://github.com/datasets/airport-codes (OurAirports data).
+// Do not infer airports from ambiguous city names such as Moscow or Istanbul.
+const destinationCodes: Record<string, string> = {
+  'antalya': 'AYT', 'enfidha': 'NBE', 'dubai': 'DXB', 'nojabrsk': 'NOJ',
+  'moscow (sheremetyevo)': 'SVO', 'moscow (domodedovo)': 'DME', 'moscow (vnukovo)': 'VKO',
+  'chelyabinsk': 'CEK', 'istanbul new airport': 'IST', 'st. petersburg (pulkovo)': 'LED',
+  'kutaisi': 'KUT', 'kaliningrad': 'KGD', 'hurghada': 'HRG', 'ekaterinburg': 'SVX',
+  'samara': 'KUF', 'tashkent': 'TAS', 'delhi': 'DEL', 'astana (int. airport)': 'NQZ',
+  'tbilisi': 'TBS', 'baku': 'GYD', 'batumi': 'BUS', 'erevan': 'EVN', 'cam ranh': 'CXR',
+  'sharm el sheikh': 'SSH', 'sanya': 'SYX', 'dushanbe': 'DYU', 'makhachkala': 'MCX',
+  'sochi (adler)': 'AER', 'xi an xianya': 'XIY', 'turkmenbashi': 'KRW', 'tel aviv': 'TLV',
+  'kazan': 'KZN', 'cherepovets': 'CEE', 'perm': 'PEE',
+}
+
+export function destinationAirportCode(destination: string): string | undefined {
+  const key = destination.trim().toLowerCase().replace(/\s+/g, ' ')
+  return Object.hasOwn(destinationCodes, key) ? destinationCodes[key] : undefined
+}
+
 export interface MinskFlight {
   id: string
   flight: string
   destination: string
+  destinationCode?: string
   scheduled: string
   estimated?: string
   status: string
@@ -31,6 +52,7 @@ export function normalizeMinskFlights(input: unknown, now = Date.now()): MinskFl
     const status = cancelled ? 'Cancelled' : (typeof row.status?.title === 'string' && row.status.title.trim()) || (delayed ? 'Delayed' : 'Scheduled')
     flights.push({
       id, flight: row.flight.trim(), destination: row.airport.title.trim(), scheduled: row.plan,
+      destinationCode: destinationAirportCode(row.airport.title),
       estimated: Number.isFinite(estimate) ? row.DelayedTo : undefined,
       status, cancelled, delayed,
       gate: Array.isArray(row.numbers_gate) ? row.numbers_gate.filter((gate: unknown) => typeof gate === 'string' && gate.trim()).join(' / ') || undefined : undefined,

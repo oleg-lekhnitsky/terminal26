@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { createFrameGate, renderBudget } from '~/utils/renderBudget'
-import { alphabetPair, cubeHiddenFaces, cubePose } from '~/utils/cubeMotion'
-import { typographySystem } from '~/utils/textRenderer'
+import { alphabetPair, cubeHiddenFaces, cubeNormals, cubePose } from '~/utils/cubeMotion'
+import { motionSystem, typographySystem } from '~/utils/textRenderer'
 
 const host = useTemplateRef('host')
 const cube = useTemplateRef('cube')
 const faces = ref(Array.from({ length: 6 }, (_, index) => alphabetPair(index)))
+const backgrounds = ['#daf759', '#5634a1', '#ff6500', '#2535f5', '#f0bed0', '#b7d3cb']
+const background = ref(backgrounds[0])
+const faceInks = ['#263219', '#daf759', '#20221f', '#f5f1df', '#642a46', '#173d35']
+const frontFace = ref(0)
+let lastColorStop = 0
 let nextLetter = 6
 let hidden = cubeHiddenFaces(0, 0)
 let observer: IntersectionObserver | undefined
@@ -28,7 +33,17 @@ function tick(now: number) {
   previous = now
   time += delta
   if (!frameGate.shouldDraw(now)) { frame = requestAnimationFrame(tick); return }
+  const stop = Math.floor((time + motionSystem.hold) / (motionSystem.enter * 2 + motionSystem.hold))
   const pose = cubePose(time)
+  if (stop !== lastColorStop) {
+    const rx = pose.x * Math.PI / 180
+    const ry = pose.y * Math.PI / 180
+    const depths = cubeNormals.map(([nx, ny, nz]) =>
+      ny * Math.sin(rx) + (-nx * Math.sin(ry) + nz * Math.cos(ry)) * Math.cos(rx))
+    frontFace.value = depths.indexOf(Math.max(...depths))
+    background.value = backgrounds[frontFace.value]
+    lastColorStop = stop
+  }
   if (cube.value) cube.value.style.transform = `rotateZ(${pose.z}deg) rotateX(${pose.x}deg) rotateY(${pose.y}deg)`
   const nextHidden = cubeHiddenFaces(pose.x, pose.y)
   nextHidden.forEach((isHidden, index) => {
@@ -66,12 +81,19 @@ onBeforeUnmount(() => {
 <template>
   <figure ref="host" class="cube-pin">
     <div class="cube-pin__art" role="img" aria-label="Rotating cube with changing uppercase and lowercase letter pairs">
+      <div class="cube-pin__background" :style="{ backgroundColor: background }" aria-hidden="true" />
+      <div class="cube-pin__heading" :style="{ color: faceInks[frontFace] }" aria-hidden="true">
+        <span>AB TERMINAL / LETTER CUBE</span>
+      </div>
       <div class="cube-pin__scene" aria-hidden="true">
         <div ref="cube" class="letter-cube" :style="{ letterSpacing: `${typographySystem.letterSpacing}em` }">
           <div v-for="(pair, index) in faces" :key="index" class="letter-cube__face" :class="`letter-cube__face--${index}`">
             {{ pair }}
           </div>
         </div>
+      </div>
+      <div class="cube-pin__footer" :style="{ color: faceInks[frontFace] }" aria-hidden="true">
+        <span>TYPE IN MOTION</span>
       </div>
     </div>
     <figcaption>Letter cube</figcaption>
@@ -89,8 +111,27 @@ onBeforeUnmount(() => {
     aspect-ratio: 4 / 5;
     overflow: hidden;
     border-radius: var(--radius-xl);
-    background: #121212;
+    background: #daf759;
   }
+
+  &__background {
+    position: absolute; inset: 0; pointer-events: none;
+    transform: translateZ(0);
+    transition: background-color 400ms ease-in-out;
+    @media (prefers-reduced-motion: reduce) { transition: none; }
+  }
+
+  &__heading, &__footer {
+    position: absolute; z-index: 1; inset-inline: 7cqw;
+    display: flex; justify-content: center; align-items: center; gap: 2cqw;
+    text-align: center;
+    font: 400 2cqw / 1.3 var(--font-sans); letter-spacing: .03em;
+    pointer-events: none;
+    transition: color 400ms ease-in-out;
+    @media (prefers-reduced-motion: reduce) { transition: none; }
+  }
+  &__heading { top: 8cqw; }
+  &__footer { bottom: 8cqw; }
 
   &__scene {
     position: absolute;
@@ -98,6 +139,7 @@ onBeforeUnmount(() => {
     display: grid;
     place-items: center;
     perspective: 180cqw;
+    transform-style: preserve-3d;
   }
 
   figcaption {
@@ -113,6 +155,7 @@ onBeforeUnmount(() => {
   inline-size: 56cqw;
   block-size: 56cqw;
   transform-style: preserve-3d;
+  will-change: transform;
   transform: rotateX(0deg) rotateY(0deg);
   font-family: var(--font-sans);
   font-size: 26cqw;
@@ -128,15 +171,16 @@ onBeforeUnmount(() => {
     display: grid;
     place-items: center;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     border: 0;
-    background: #f5f6f7;
+    background: #daf759;
 
-    &--0 { transform: translateZ(28cqw); }
-    &--1 { transform: rotateY(90deg) translateZ(28cqw); }
-    &--2 { transform: rotateY(180deg) translateZ(28cqw); }
-    &--3 { transform: rotateY(-90deg) translateZ(28cqw); }
-    &--4 { transform: rotateX(90deg) translateZ(28cqw); }
-    &--5 { transform: rotateX(-90deg) translateZ(28cqw); }
+    &--0 { transform: translateZ(28cqw); background: #daf759; color: #263219; }
+    &--1 { transform: rotateY(90deg) translateZ(28cqw); background: #5634a1; color: #daf759; }
+    &--2 { transform: rotateY(180deg) translateZ(28cqw); background: #ff6500; color: #20221f; }
+    &--3 { transform: rotateY(-90deg) translateZ(28cqw); background: #2535f5; color: #f5f1df; }
+    &--4 { transform: rotateX(90deg) translateZ(28cqw); background: #f0bed0; color: #642a46; }
+    &--5 { transform: rotateX(-90deg) translateZ(28cqw); background: #b7d3cb; color: #173d35; }
   }
 }
 </style>

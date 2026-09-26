@@ -4,30 +4,6 @@ import { motionSystem, typographySystem } from '~/utils/textRenderer'
 import type { MinskDepartures } from '~/utils/minskFlights'
 
 const host = useTemplateRef('host')
-const { activeFont } = useFontSelection()
-const timeSize = ref(26)
-// Fit the widest time for each face, including italic glyph overhang.
-// Measuring at a fixed size makes the result independent of card width.
-watch(activeFont, async (font, _, onCleanup) => {
-  if (!import.meta.client) return
-  let cancelled = false
-  onCleanup(() => { cancelled = true })
-  timeSize.value = 26
-  const descriptor = `${font.style} ${font.weight} 100px "AB Terminal"`
-  await document.fonts.load(descriptor, '0123456789:')
-  if (cancelled) return
-  const context = document.createElement('canvas').getContext('2d')
-  if (!context) return
-  context.font = descriptor
-  let widest = 0
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute++) {
-      const metrics = context.measureText(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`)
-      widest = Math.max(widest, metrics.width, metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight)
-    }
-  }
-  timeSize.value = Math.min(33, 86 * 100 / widest)
-}, { immediate: true })
 const { data, error, status, execute } = useFetch<MinskDepartures>('/api/minsk-flights', { server: false, immediate: false })
 const page = ref(0)
 const pageSize = 1
@@ -99,95 +75,331 @@ onBeforeUnmount(() => {
       <div v-if="flight" class="flights-pin__board">
         <Transition name="flights" :duration="transitionDuration">
           <article :key="flight.id" class="flights-pin__slide">
-            <header class="flights-pin__heading">
-              <div class="flights-pin__mask"><div class="flight-step" style="--step: 0">
-              <p class="flights-pin__destination" :style="{ fontSize: `${flight.destination.length > 30 ? 4.2 : 5.5}cqw` }">{{ flight.destination }}</p>
-              <p class="flights-pin__status" :class="{ 'is-alert': flight.cancelled || flight.delayed, 'is-boarding': /boarding/i.test(flight.status) }">{{ flight.status }}<span v-if="flight.estimated && !flight.cancelled"> / {{ time(flight.estimated) }}</span></p>
-              </div></div>
+            <header class="flights-pin__heading flight-step" style="--step: 0">
+              <p>{{ flight.flight }}</p>
+              <p class="flights-pin__status" :class="{ 'is-alert': flight.cancelled || flight.delayed }">{{
+                flight.status }}</p>
             </header>
-            <div class="flights-pin__departure">
-              <div class="flights-pin__mask"><time class="flights-pin__time flight-step" :style="{ '--step': 1, fontSize: `${timeSize}cqw` }" :datetime="flight.scheduled" aria-label="Departure time in Minsk, UTC+3">{{ time(flight.scheduled) }}</time></div>
-              <div class="flights-pin__details flight-step" style="--step: 2">
-                <p>{{ flight.flight }}</p>
-                <p :aria-label="`Gate ${flight.gate || 'not assigned'}`">{{ flight.gate || '—' }}</p>
+            <div class="flights-pin__route flight-step" style="--step: 1">
+              <div>
+                <p class="flights-pin__code">MSQ</p>
+                <p class="flights-pin__city">Minsk</p>
+              </div>
+              <svg class="flights-pin__path" viewBox="0 0 120 60" aria-hidden="true">
+                <path d="M-8 46 Q60 -8 128 46" fill="none" stroke="currentColor" stroke-width="1.5"
+                  stroke-dasharray="2 4" />
+                <circle cx="-8" cy="46" r="3" fill="currentColor" />
+                <circle cx="128" cy="46" r="3" fill="currentColor" />
+                <g transform="translate(48 7) rotate(90 12 12)" fill="currentColor">
+                  <path d="M10 0h4v8h4v4h4v4h-8v4h4v4H6v-4h4v-4H2v-4h4V8h4z" />
+                </g>
+              </svg>
+              <div class="flights-pin__arrival">
+                <p v-if="flight.destinationCode" class="flights-pin__code">{{ flight.destinationCode }}</p>
+                <p :class="flight.destinationCode ? 'flights-pin__city' : 'flights-pin__destination'">{{
+                  flight.destination }}</p>
               </div>
             </div>
-            <footer class="flight-step" style="--step: 3">
-              <p class="flights-pin__date">{{ date.format(new Date(flight.scheduled)) }}</p>
-              <p class="flights-pin__airport">MINSK NATIONAL / MSQ</p>
+            <footer class="flight-step" style="--step: 2">
+              <div>
+                <p class="flights-pin__label">Departure · {{ date.format(new Date(flight.scheduled)) }}</p><time
+                  :datetime="flight.scheduled">{{ time(flight.scheduled) }}</time><span
+                  v-if="flight.estimated && !flight.cancelled"> → {{ time(flight.estimated) }}</span>
+              </div>
+              <div>
+                <p class="flights-pin__label">Gate</p>
+                <p>{{ flight.gate || 'Not assigned' }}</p>
+              </div>
             </footer>
           </article>
         </Transition>
       </div>
-      <div v-else class="flights-pin__empty"><p>{{ error ? 'Departures unavailable' : data ? 'No upcoming departures' : 'Checking departures…' }}</p><button v-if="error" type="button" @click="refresh">Try again</button></div>
+      <div v-else class="flights-pin__empty">
+        <p>{{ error ? 'Departures unavailable' : data ? 'No upcoming departures' : 'Checking departures…' }}</p><button
+          v-if="error" type="button" @click="refresh">Try again</button>
+      </div>
       <template v-if="flight && pageCount > 1">
-        <button class="flights-pin__nav flights-pin__nav--previous" type="button" aria-label="Previous departure" @click="changeFlight(-1); navigationHaptic()" />
-        <button class="flights-pin__nav flights-pin__nav--next" type="button" aria-label="Next departure" @click="changeFlight(1); navigationHaptic()" />
+        <button class="flights-pin__nav flights-pin__nav--previous" type="button" aria-label="Previous departure"
+          @click="changeFlight(-1); navigationHaptic()" />
+        <button class="flights-pin__nav flights-pin__nav--next" type="button" aria-label="Next departure"
+          @click="changeFlight(1); navigationHaptic()" />
       </template>
     </div>
     <p v-if="error && data" class="flights-pin__notice" role="status">Update unavailable</p>
-    <figcaption><span>Departures</span><a href="https://airport.by/en/raspisanie-rejsov/vylety" target="_blank" rel="noopener noreferrer">Minsk Airport ↗</a></figcaption>
+    <figcaption><span>Departures</span><a href="https://airport.by/en/raspisanie-rejsov/vylety" target="_blank"
+        rel="noopener noreferrer">Minsk Airport ↗</a></figcaption>
   </figure>
 </template>
 
 <style scoped lang="scss">
 .flights-pin {
-  margin: 0 0 var(--space-6); break-inside: avoid;
-  &__art { container-type: inline-size; position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius-xl); background: #100315; color: #f6eed9; font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); letter-spacing: var(--flight-tracking); }
-  &__board, &__slide { position: absolute; inset: 0; }
-  p { margin: 0; }
-  &__mask { overflow: hidden; padding-block: .12em; margin-block: -.12em; }
-  &__slide { text-transform: uppercase; text-align: center; }
-  &__heading { position: absolute; top: 6cqw; inset-inline: 7cqw; }
-  &__destination { line-height: 1.2; letter-spacing: .08em; text-wrap: balance; overflow-wrap: anywhere; }
-  &__status { margin-top: 1cqw !important; font-size: 5.5cqw; line-height: 1.2; letter-spacing: .08em; color: #625364; }
-  &__status.is-alert { color: #ff987e; }
-  &__status.is-boarding { color: #cce99c; }
-  &__departure { position: absolute; top: 49cqw; inset-inline: 5cqw; }
-  &__time { display: block; font-size: 33cqw; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  &__details { margin-top: 5cqw; padding-inline: 4cqw; font-size: 3cqw; line-height: 1.5; letter-spacing: .08em; color: #625364; overflow-wrap: anywhere; }
-  footer { position: absolute; bottom: 7cqw; inset-inline: 7cqw; color: #625364; }
-  &__date { font-size: 5.5cqw; line-height: 1.2; letter-spacing: .12em; }
-  &__airport { margin-top: 3cqw !important; font-size: 2cqw; letter-spacing: .25em; }
-  &__empty { position: absolute; inset: 32cqw 7cqw 14cqw; display: grid; place-content: center; text-align: center; font-size: 3.6cqw; }
-  &__notice { padding: var(--space-2); font-size: var(--text-sm); }
-  button:not(.flights-pin__nav) { font: inherit; color: inherit; border: 0; background: transparent; padding: .6em; cursor: pointer; text-decoration: underline; text-underline-offset: .2em; }
-  button:not(.flights-pin__nav):active { transform: scale(.96); }
-  &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-    position: absolute; z-index: 2; top: 0; bottom: 0; width: 35%;
-    border: 0; padding: 0; background: transparent; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    &::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity var(--flight-hover) var(--ease-flow); pointer-events: none; }
-    &--previous { left: 0; }
-    &--next { right: 0; }
-    &--previous::before { background: linear-gradient(to right, rgb(255 255 255 / .08), transparent); }
-    &--next::before { background: linear-gradient(to left, rgb(255 255 255 / .08), transparent); }
-    &:focus-visible { outline: 2px solid #f6eed9; outline-offset: -4px; }
-    &:focus-visible::before, &:active::before { opacity: 1; }
-    @media (hover: hover) { &:hover::before { opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) { &::before { transition: none; } }
+  margin: 0 0 var(--space-6);
+  break-inside: avoid;
+
+  &__art {
+    container-type: inline-size;
+    position: relative;
+    aspect-ratio: 4 / 2.5;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: #10181a;
+    color: #daf759;
+    font-family: var(--font-sans);
+    font-weight: var(--specimen-weight, 700);
+    font-style: var(--specimen-style, normal);
+    letter-spacing: var(--flight-tracking);
   }
-  figcaption { display: flex; justify-content: space-between; align-items: baseline; padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
-  a { color: inherit; font-size: .75em; text-underline-offset: .2em; }
+
+  &__board {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-items: center;
+  }
+
+  &__slide {
+    position: absolute;
+    inset-inline: 5cqw;
+    top: 50%;
+    transform: translateY(-50%);
+    overflow: hidden;
+    border-radius: 7cqw;
+    background: #daf759;
+    color: #20221f;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 3cqw;
+    padding: 4cqw 4cqw 0;
+    font-size: max(11px, 2.8cqw);
+    line-height: 1.3;
+  }
+
+  &__status {
+    text-align: right;
+    max-width: 60%;
+  }
+
+  &__status.is-alert {
+    text-decoration: underline;
+    text-underline-offset: .2em;
+  }
+
+  &__route {
+    display: grid;
+    grid-template-columns: 1fr .9fr 1fr;
+    align-items: start;
+    gap: 2cqw;
+    padding: 4cqw;
+    min-height: 25cqw;
+  }
+
+  &__code {
+    font-size: 10cqw;
+    line-height: 1;
+  }
+
+  &__city {
+    margin-top: 1cqw !important;
+    min-height: 2.6em;
+    font-size: max(11px, 2.8cqw);
+    line-height: 1.3;
+  }
+
+  &__path {
+    width: 100%;
+    overflow: visible;
+  }
+
+  &__arrival {
+    text-align: right;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &__destination {
+    font-size: 5.5cqw;
+    line-height: 1.05;
+    text-align: right;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 3cqw;
+    padding: 3cqw 4cqw 4cqw;
+    background: rgb(32 34 31 / .07);
+    font-size: max(12px, 3.5cqw);
+    line-height: 1.4;
+  }
+
+  footer>div:last-child {
+    text-align: right;
+  }
+
+  &__label {
+    font-size: max(10px, 2.5cqw);
+    margin-bottom: 1cqw !important;
+  }
+
+  &__empty {
+    position: absolute;
+    inset: 7cqw;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    font-size: max(12px, 3.6cqw);
+  }
+
+  &__notice {
+    padding: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  button:not(.flights-pin__nav) {
+    font: inherit;
+    color: inherit;
+    border: 0;
+    background: transparent;
+    padding: .6em;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: .2em;
+  }
+
+  button:not(.flights-pin__nav):active {
+    transform: scale(.96);
+  }
+
+  &__nav {
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    width: 35%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity var(--flight-hover) var(--ease-flow);
+      pointer-events: none;
+    }
+
+    &--previous {
+      left: 0;
+    }
+
+    &--next {
+      right: 0;
+    }
+
+    &--previous::before {
+      background: linear-gradient(to right, rgb(255 255 255 / .08), transparent);
+    }
+
+    &--next::before {
+      background: linear-gradient(to left, rgb(255 255 255 / .08), transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #f6eed9;
+      outline-offset: -4px;
+    }
+
+    &:focus-visible::before,
+    &:active::before {
+      opacity: 1;
+    }
+
+    @media (hover: hover) {
+      &:hover::before {
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &::before {
+        transition: none;
+      }
+    }
+  }
+
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: var(--space-3) var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  a {
+    color: inherit;
+    font-size: .75em;
+    text-underline-offset: .2em;
+  }
 }
+
 .flights-enter-active .flight-step,
 .flights-leave-active .flight-step {
   transition-property: transform, opacity;
   transition-timing-function: var(--ease-flow);
 }
+
 .flights-enter-active .flight-step {
   transition-duration: var(--flight-enter);
   transition-delay: calc(var(--flight-overlap) + var(--step) * var(--flight-stagger));
 }
-.flights-leave-active { pointer-events: none; }
+
+.flights-leave-active {
+  pointer-events: none;
+}
+
 .flights-leave-active .flight-step {
   transition-duration: var(--flight-exit);
   transition-delay: calc(var(--step) * var(--flight-stagger) / 2);
 }
-.flights-enter-from .flight-step { opacity: 0; transform: translateY(var(--flight-travel)); }
-.flights-leave-to .flight-step { opacity: 0; transform: translateY(calc(var(--flight-travel) / -2)); }
+
+.flights-enter-from .flight-step {
+  opacity: 0;
+  transform: translateY(var(--flight-travel));
+}
+
+.flights-leave-to .flight-step {
+  opacity: 0;
+  transform: translateY(calc(var(--flight-travel) / -2));
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .flights-enter-active .flight-step, .flights-leave-active .flight-step { transition: none; }
-  .flights-enter-from .flight-step, .flights-leave-to .flight-step { transform: none; }
+
+  .flights-enter-active .flight-step,
+  .flights-leave-active .flight-step {
+    transition: none;
+  }
+
+  .flights-enter-from .flight-step,
+  .flights-leave-to .flight-step {
+    transform: none;
+  }
 }
 </style>

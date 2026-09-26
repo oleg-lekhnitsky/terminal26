@@ -130,9 +130,9 @@ onBeforeUnmount(() => {
     background: #eeeae3; color: #24221f; font: 400 13px var(--font-sans); cursor: pointer;
     font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     transition: background-color 150ms ease, scale 150ms ease;
-    @media (hover: hover) { &:hover { background: #f2df64; } }
+    @media (hover: hover) { &:hover { background: #daf759; } }
     &:active { scale: .96; }
-    &:focus-visible { outline: 2px solid #f2df64; outline-offset: 3px; }
+    &:focus-visible { outline: 2px solid #daf759; outline-offset: 3px; }
     @media (prefers-reduced-motion: reduce) { transition: none; }
   }
   &__content { display: grid; gap: clamp(24px, 3vw, 48px); }

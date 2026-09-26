@@ -16,8 +16,8 @@ export const galleryLayouts = {
     ['carousel', 'truck', 'tote', 'numbers', 'slide', 'glyph', 'ascii', 'weather', 'globe', 'poster-maker', 'tablet'],
   ],
   4: [
-    ['rise', 'can', 'drop', 'flights', 'radio', 'pricing', 'ascii', 'poster'],
-    ['clock', 'letter', 'glyph', 'words', 'cube', 'exchange', 'coffee', 'tablet'],
+    ['rise', 'can', 'drop', 'flights', 'radio', 'pricing', 'ascii', 'poster', 'tablet'],
+    ['clock', 'letter', 'glyph', 'words', 'cube', 'exchange', 'coffee'],
     ['alphabet', 'carousel', 'truck', 'wheel', 'watch', 'gradient', 'pharmacy', 'collage'],
     ['tote', 'slide', 'numbers', 'poster-maker', 'globe', 'city', 'weather', 'photo'],
   ],

@@ -127,7 +127,7 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .weather-pin {
   margin: 0 0 var(--space-6); break-inside: avoid;
-  &__art { position: relative; container-type: inline-size; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius-xl); background: #f1d58a; color: #473414; text-align: center; font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); letter-spacing: var(--weather-tracking); }
+  &__art { position: relative; container-type: inline-size; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius-xl); background: #daf759; color: #473414; text-align: center; font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); letter-spacing: var(--weather-tracking); }
   &__art { transition: background-color var(--weather-enter) var(--ease-flow), color var(--weather-enter) var(--ease-flow); }
   &__sky, &__sky img, &__scrim { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   &__sky img { object-fit: cover; transition: opacity var(--weather-enter) var(--ease-flow), filter var(--weather-enter) var(--ease-flow); }

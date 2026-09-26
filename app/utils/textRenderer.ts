@@ -58,8 +58,8 @@ export const motionProfiles = {
 
 export const textPresets = ([
   { id: 'rise', name: 'Rise', text: 'Hello{', background: '#ede9e1', color: '#24221f', aspectRatio: '22 / 12' },
-  { id: 'letter', name: 'One at a time', text: oneShotText('bold'), background: '#d5ef72', color: '#263219', aspectRatio: '22 / 28' },
-  { id: 'carousel', name: 'Flip flop', text: '"|', background: '#038249', color: '#7c15cc', aspectRatio: '22 / 23' },
+  { id: 'letter', name: 'One at a time', text: oneShotText('bold'), background: '#ffbd13', color: '#263219', aspectRatio: '22 / 28' },
+  { id: 'carousel', name: 'Flip flop', text: '"|', background: '#026b2c', color: '#f652e3', aspectRatio: '22 / 23' },
   { id: 'drop', name: 'Drop', text: 'Латиница', background: '#f1f1e9', color: '#421f18', aspectRatio: '22 / 8' },
   { id: 'typewriter', name: 'Typewriter', text: '$20', background: '#252e48', color: '#f0e9d9', aspectRatio: '22 / 24' },
   { id: 'slide', name: 'On repeat', text: 'I opened this file to fix one tiny thing. Three hours later, the letters have a new font, the cube has opinions, and I have forgotten what the tiny thing was. Anyway, look at that spacing.', background: '#b7d3cb', color: '#173d35', aspectRatio: '22 / 16' },
@@ -79,7 +79,7 @@ export const textPresets = ([
 export type TextPreset = typeof textPresets[number]['id']
 export const isContinuousPreset = (preset: TextPreset) => ['letter', 'carousel', 'slide', 'fan', 'words', 'numbers', 'collage'].includes(preset)
 
-const collageColors = ['#101611', '#087abb', '#101611', '#5634a1', '#efbe05', '#101611', '#06774f', '#db181e']
+const collageColors = ['#101611', '#087abb', '#101611', '#5634a1', '#daf759', '#101611', '#06774f', '#db181e']
 // Clipped edge layers, crossing middle layers, then three readable paper fronts.
 export const collageTiles = [
   [0.04, 0.02, -0.62], [0.49, 0.02, 1.48], [0.98, 0.09, 0.68],

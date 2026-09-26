@@ -189,9 +189,9 @@ onBeforeUnmount(() => {
     position: absolute; inset: 0; display: grid; place-content: center;
     font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal);
     font-size: 19cqw; line-height: 0.95; letter-spacing: var(--camera-tracking); text-align: center;
-    color: #f1ffbb; pointer-events: none;
+    color: #daf759; pointer-events: none;
   }
-  &__play { position: absolute; z-index: 3; bottom: 13cqw; left: 50%; transform: translateX(-50%); border: 0; border-radius: 999px; padding: 0.75em 1em; background: #f1ffbb; color: #213735; font: inherit; cursor: pointer; }
+  &__play { position: absolute; z-index: 3; bottom: 13cqw; left: 50%; transform: translateX(-50%); border: 0; border-radius: 999px; padding: 0.75em 1em; background: #daf759; color: #213735; font: inherit; cursor: pointer; }
   &__nav { appearance: none; -webkit-appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     position: absolute; z-index: 2; top: 0; bottom: 0; width: 35%;
     border: 0; padding: 0; background: transparent; cursor: pointer;
@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
     &--next { right: 0; }
     &--previous::before { background: linear-gradient(to right, rgb(0 0 0 / .25), transparent); }
     &--next::before { background: linear-gradient(to left, rgb(0 0 0 / .25), transparent); }
-    &:focus-visible { outline: 2px solid #f1ffbb; outline-offset: -4px; }
+    &:focus-visible { outline: 2px solid #daf759; outline-offset: -4px; }
     &:focus-visible::before, &:active::before { opacity: 1; }
     @media (hover: hover) { &:hover::before { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) { &::before { transition: none; } }

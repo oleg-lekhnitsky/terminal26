@@ -111,8 +111,8 @@ onBeforeUnmount(() => {
     color: inherit;
     background: #f7f6f2;
     transition: background-color var(--selector-duration) var(--ease-flow);
-    &:focus-visible { outline: 2px solid #f2df64; outline-offset: 3px; }
-    @media (hover: hover) { &:hover { background: #f2df64; } }
+    &:focus-visible { outline: 2px solid #daf759; outline-offset: 3px; }
+    @media (hover: hover) { &:hover { background: #daf759; } }
   }
 
   &__button {

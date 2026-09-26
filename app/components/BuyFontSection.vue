@@ -78,7 +78,7 @@ defineExpose({ openShop })
     font-size: clamp(32px, 7vw, 128px); line-height: 1.05; text-align: center;
     font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     transition: color 150ms ease, scale 150ms ease;
-    @media (hover: hover) { &:hover { color: #f2df64; } }
+    @media (hover: hover) { &:hover { color: #daf759; } }
     &:active { scale: .96; }
     &:focus-visible { outline: 2px solid #eeeae3; outline-offset: 4px; }
     @media (max-width: 600px) { border-radius: 48px; }
@@ -102,7 +102,7 @@ defineExpose({ openShop })
   &__option {
     display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 12px;
     border-radius: 12px; background: #24221f08; cursor: pointer; font-size: 16px;
-    &.is-selected { background: #f2df64; }
+    &.is-selected { background: #daf759; }
     &:focus-within { outline: 2px solid #24221f; outline-offset: 2px; }
     small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; font-style: normal; }
   }
@@ -135,8 +135,8 @@ defineExpose({ openShop })
     position: absolute; top: 12px; right: 12px; display: grid; place-items: center;
     width: 44px; height: 44px; border: 0; border-radius: 0; background: transparent; color: #24221f;
     svg { width: 20px; height: 20px; }
-    @media (hover: hover) { &:hover { background: #f2df64; } }
-    &:focus-visible { outline: 2px solid #f2df64; outline-offset: 2px; }
+    @media (hover: hover) { &:hover { background: #daf759; } }
+    &:focus-visible { outline: 2px solid #daf759; outline-offset: 2px; }
   }
   @media (prefers-reduced-motion: reduce) { &__button { transition: none; } }
 }

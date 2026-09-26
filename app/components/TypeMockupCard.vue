@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
     display: grid;
     place-content: center;
     text-align: center;
-    color: var(--mockup-ink, #d5ef72);
+    color: var(--mockup-ink, #daf759);
     font-family: var(--font-sans);
     font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
