@@ -111,12 +111,15 @@ onBeforeUnmount(() => {
     aspect-ratio: 4 / 5;
     overflow: hidden;
     border-radius: var(--radius-xl);
+    // Clip composited 3D faces as well as ordinary painted content.
+    clip-path: inset(0 round var(--radius-xl));
+    contain: paint;
+    isolation: isolate;
     background: #daf759;
   }
 
   &__background {
     position: absolute; inset: 0; pointer-events: none;
-    transform: translateZ(0);
     transition: background-color 400ms ease-in-out;
     @media (prefers-reduced-motion: reduce) { transition: none; }
   }
@@ -135,11 +138,11 @@ onBeforeUnmount(() => {
 
   &__scene {
     position: absolute;
+    z-index: 0;
     inset: 0;
     display: grid;
     place-items: center;
     perspective: 180cqw;
-    transform-style: preserve-3d;
   }
 
   figcaption {

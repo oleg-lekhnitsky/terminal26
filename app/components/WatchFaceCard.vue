@@ -68,11 +68,13 @@ onBeforeUnmount(() => {
       <svg viewBox="0 0 400 500" aria-hidden="true" class="watch" :style="{ '--watch-digit-size': `${digitSize}px` }">
         <defs>
           <linearGradient :id="`${id}-strap`" x1="0" x2="1">
-            <stop stop-color="#101112" />
-            <stop offset=".16" stop-color="#292a2c" />
-            <stop offset=".5" stop-color="#202123" />
-            <stop offset=".88" stop-color="#17181a" />
-            <stop offset="1" stop-color="#08090a" />
+            <stop stop-color="#171819" />
+            <stop offset=".06" stop-color="#262729" />
+            <stop offset=".2" stop-color="#292a2b" />
+            <stop offset=".5" stop-color="#242526" />
+            <stop offset=".8" stop-color="#222324" />
+            <stop offset=".94" stop-color="#1e1f20" />
+            <stop offset="1" stop-color="#141516" />
           </linearGradient>
           <linearGradient :id="`${id}-case`" x1="0" y1="0" x2="1" y2=".25">
             <stop stop-color="#131416" />
@@ -128,8 +130,9 @@ onBeforeUnmount(() => {
           </linearGradient>
         </defs>
         <g class="watch__body">
-          <path d="M130 -20 H270 L273 76 Q273 103 288 126 V375 Q271 398 272 425 L277 520 H123 L128 425 Q129 398 112 375 V126 Q127 103 127 76 Z" :fill="`url(#${id}-strap)`" />
-          <path d="M131 0 L132 79 M269 423 L273 500" stroke="#fff" stroke-opacity=".07" fill="none" />
+          <!-- Broad, curved shoulders tuck beneath the case; soft shading models the rubber edges. -->
+          <path d="M130 -20 H270 C270 34 272 66 287 90 Q293 102 304 114 H96 Q107 102 113 90 C128 66 130 34 130 -20 Z" :fill="`url(#${id}-strap)`" />
+          <path d="M96 390 H304 Q293 402 287 414 C272 438 270 470 270 524 H130 C130 470 128 438 113 414 Q107 402 96 390 Z" :fill="`url(#${id}-strap)`" />
           <rect x="329" y="172" width="18" height="43" rx="7" :fill="`url(#${id}-crown)`" />
           <path v-for="ridge in 7" :key="ridge" :d="`M${331 + ridge * 1.8} 179 V208`" stroke="#08090a" stroke-width=".8" />
           <rect x="333" y="249" width="6" height="49" rx="3" fill="#292b2e" />
