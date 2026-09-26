@@ -14,7 +14,7 @@ function nextAlphabet() { alphabetIndex.value = (alphabetIndex.value + 1) % alph
 <template>
   <figure class="alphabet-pin">
     <div class="alphabet-pin__art">
-      <WebGLText class="alphabet-pin__letters" :text="alphabet.text" preset="poster" preserve-case stagger-by-words
+      <WebGLText class="alphabet-pin__letters" :text="alphabet.text" :letter-spacing="0" preset="poster" preserve-case stagger-by-words
         :duration="motionSystem.enter / 2" :stagger="motionSystem.stagger / 2" :hold="2.5" :line-height="0.95"
         color="#642a46" :font-weight="activeFont.weight" :font-style="activeFont.style" @cycle-complete="nextAlphabet" loop />
       <div class="alphabet-pin__micro alphabet-pin__micro--top"><span>AB TERMINAL</span><span>{{ alphabet.label }}</span></div>
