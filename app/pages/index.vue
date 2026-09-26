@@ -12,7 +12,7 @@ import type { Component } from 'vue'
 
 const siteUrl = useRuntimeConfig().public.siteUrl.replace(/\/$/, '')
 const pageTitle = 'AB Terminal — Typeface by Alex Blohin'
-const description = 'A pixel typeface by Alex Blohin. Explore four styles, try your own text, and use AB Terminal in personal and commercial projects across desktop, web, and apps.'
+const description = 'Explore four styles, try your own text, and use AB Terminal in personal and commercial projects across desktop, web, and apps.'
 useSeoMeta({
   title: pageTitle,
   description,
@@ -26,7 +26,7 @@ useSeoMeta({
   ogImageWidth: 1200,
   ogImageHeight: 630,
   ogImageType: 'image/png',
-  ogImageAlt: 'AB Terminal in its bold pixel typeface on black, with the credit typeface by Alex Blohin.',
+  ogImageAlt: 'AB Terminal in its bold typeface on black, with the credit typeface by Alex Blohin.',
   twitterCard: 'summary_large_image',
   twitterTitle: pageTitle,
   twitterDescription: description,
