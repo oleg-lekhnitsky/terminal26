@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import { fontProducts, addFontToCart, type FontProductId } from '~/utils/fontShop'
-import { motionSystem } from '~/utils/textRenderer'
 
-const { activeFont } = useFontSelection()
 const cartTitleId = `${useId()}-font-cart-title`
-const selected = ref<FontProductId>(activeFont.value.id)
-const product = computed(() => fontProducts.find(item => item.id === selected.value)!)
 const cart = useState<FontProductId[]>('font-cart', () => [])
 const cartProducts = computed(() => fontProducts.filter(item => cart.value.includes(item.id)))
 const total = computed(() => cartProducts.value.reduce((sum, item) => sum + item.price, 0))
-const included = computed(() => cart.value.includes(product.value.id) || cart.value.includes('full-pack'))
+const included = (id: FontProductId) => cart.value.includes(id) || cart.value.includes('full-pack')
 const dialog = useTemplateRef('dialog')
 const money = (value: number) => `$${value}`
 const { checkingOut, checkoutError, checkout } = useFontCheckout(() => cart.value)
 let loaded = false
-watch(activeFont, font => { if (selected.value !== 'full-pack') selected.value = font.id })
 onMounted(() => {
   try {
     const saved: unknown = JSON.parse(localStorage.getItem('terminal-font-cart-v1') || '[]')
@@ -29,10 +24,14 @@ onMounted(() => {
 watch(cart, value => {
   if (loaded) try { localStorage.setItem('terminal-font-cart-v1', JSON.stringify(value)) } catch { /* Keep the in-memory cart. */ }
 }, { deep: true })
-function add() { cart.value = addFontToCart(cart.value, product.value.id) }
-function changeStyle(direction: number) {
-  const index = fontProducts.findIndex(item => item.id === selected.value)
-  selected.value = fontProducts[(index + direction + fontProducts.length) % fontProducts.length]!.id
+function add(id: FontProductId) { cart.value = addFontToCart(cart.value, id) }
+function navigateProducts(event: KeyboardEvent) {
+  const list = event.currentTarget as HTMLElement
+  const tiles = Array.from(list.children) as HTMLElement[]
+  const step = tiles[1] ? tiles[1].offsetLeft - tiles[0]!.offsetLeft : list.clientWidth
+  const current = Math.round(list.scrollLeft / step)
+  const next = Math.max(0, Math.min(tiles.length - 1, current + (event.key === 'ArrowRight' ? 1 : -1)))
+  list.scrollTo({ left: next * step, behavior: 'instant' })
 }
 </script>
 
@@ -41,31 +40,20 @@ function changeStyle(direction: number) {
     <div class="price-pin__art">
       <header><span>AB Terminal</span><button type="button" @click="dialog?.showModal()">Cart · {{ cart.length
           }}</button></header>
-      <div class="price-pin__selection" role="group" aria-label="Font style or full pack"
-        @keydown.left.prevent="changeStyle(-1)" @keydown.right.prevent="changeStyle(1)">
-        <button class="price-pin__step" type="button" aria-label="Previous font option" @click="changeStyle(-1)">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m12 6-6 6 6 6M6 12h12" />
-          </svg>
-        </button>
-        <span class="price-pin__style" aria-live="polite" aria-atomic="true"
-          :style="{ fontWeight: product.weight, fontStyle: product.style }">{{ product.label }}</span>
-        <button class="price-pin__step" type="button" aria-label="Next font option" @click="changeStyle(1)">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m12 6 6 6-6 6M6 12h12" />
-          </svg>
-        </button>
-      </div>
-      <div class="price-pin__price" :aria-label="`${product.label}, ${money(product.price)} USD`">
-        <WebGLText :text="money(product.price)" preset="typewriter" :duration="motionSystem.enter / 2"
-          :stagger="motionSystem.stagger / 2" :font-weight="product.weight" :font-style="product.style"
-          color="#f0e9d9" />
-      </div>
-      <div class="price-pin__purchase">
-        <p>{{ product.description }} · USD</p>
-        <button class="price-pin__add" :class="{ 'price-pin__add--checkout': included }" type="button" @click="included ? dialog?.showModal() : add()">{{ included ? 'Checkout' : 'Add to cart' }}</button>
-        <span class="price-pin__sr" role="status">{{ cart.length ? `${cart.length} items in cart` : '' }}</span>
-      </div>
+      <ul class="price-pin__products" tabindex="0" aria-label="Font styles and prices. Use left and right arrow keys to browse."
+        @keydown.left.prevent="navigateProducts" @keydown.right.prevent="navigateProducts">
+        <li v-for="product in fontProducts" :key="product.id" class="price-pin__product">
+          <div class="price-pin__specimen"
+            :style="{ fontWeight: product.weight, fontStyle: product.style }">
+            <h3>{{ product.label }}</h3>
+            <p :aria-label="`${product.price} US dollars`">{{ money(product.price) }}</p>
+          </div>
+          <button class="price-pin__add" :class="{ 'price-pin__add--checkout': included(product.id) }" type="button"
+            :aria-label="included(product.id) ? `Checkout ${product.label}` : `Add ${product.label} to cart`"
+            @click="included(product.id) ? dialog?.showModal() : add(product.id)">{{ included(product.id) ? 'Checkout' : 'Add to cart' }}</button>
+        </li>
+      </ul>
+      <span class="sr-only" role="status">{{ cart.length ? `${cart.length} items in cart` : '' }}</span>
     </div>
     <figcaption>Font shop</figcaption>
     <dialog ref="dialog" class="price-cart" :aria-labelledby="cartTitleId" @click.self="dialog?.close()">
@@ -111,160 +99,49 @@ function changeStyle(direction: number) {
 .price-pin {
   margin: 0 0 var(--space-6);
   break-inside: avoid;
-
   &__art {
-    container-type: inline-size;
-    position: relative;
-    aspect-ratio: 22 / 24;
-    overflow: hidden;
-    border-radius: var(--radius-xl);
-    background: #252e48;
-    color: #f0e9d9;
-    font-family: var(--font-sans);
-    font-weight: var(--specimen-weight, 700);
-    font-style: var(--specimen-style, normal);
+    container-type: inline-size; position: relative; aspect-ratio: 22 / 24;
+    overflow: hidden; border-radius: var(--radius-xl); background: #ff6500; color: #20221f;
+    font-family: var(--font-sans); font-weight: 400; font-style: normal;
   }
-
-  &__art>header {
-    position: absolute;
-    top: 7cqw;
-    inset-inline: 7cqw;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 3cqw;
+  &__art > header {
+    position: absolute; top: 6%; inset-inline: 8%;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: clamp(10px, 2.5cqw, 13px); line-height: 1.3; text-transform: uppercase;
   }
-
-  button {
-    font: inherit;
+  button { font: inherit; cursor: pointer; }
+  &__art > header button {
+    position: absolute; top: 50%; right: 0; transform: translateY(-50%);
+    min-height: 44px; padding: 0; border: 0; background: transparent; color: inherit;
   }
-
-  &__art>header button {
-    padding: .5em 0 .5em .75em;
-    border: 0;
-    color: inherit;
-    background: transparent;
-    cursor: pointer;
+  &__products {
+    position: absolute; inset-inline: 0; top: 32cqw; bottom: 5cqw;
+    display: flex; gap: 3cqw; padding: 0 5cqw; margin: 0; list-style: none;
+    overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
+    scroll-padding-inline: 5cqw; scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    &:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
   }
-
-  &__selection {
-    position: absolute;
-    top: 19cqw;
-    inset-inline: 12cqw;
-    display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) 44px;
-    align-items: center;
-    text-align: center;
-    z-index: 1;
+  &__product {
+    flex: 0 0 72cqw; min-width: 0; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 3cqw; border-radius: 7cqw; background: #f1f1e9; color: #20221f;
+    scroll-snap-align: start;
   }
-
-  &__style {
-    font-size: 5cqw;
-    line-height: 1.2;
-    white-space: nowrap;
+  &__specimen {
+    padding: 0 1cqw 1cqw; transform: translateY(-1cqw); font-size: 13cqw; line-height: 1.1; letter-spacing: -.035em;
+    h3, p { margin: 0; font: inherit; }
   }
-
-  &__step {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    color: inherit;
-    background: transparent;
-    opacity: .45;
-    cursor: pointer;
-    transition: opacity 150ms ease, background-color 150ms ease;
-  }
-
-  &__step:hover,
-  &__step:focus-visible {
-    opacity: 1;
-    background: #f0e9d90a;
-  }
-
-  &__step svg {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  &__price {
-    position: absolute;
-    top: 25cqw;
-    inset-inline: 3cqw;
-    height: 57cqw;
-    --webgl-text-height: 100%;
-    pointer-events: none;
-  }
-
-  &__price :deep(.webgl-text) {
-    height: 100%;
-  }
-
-  &__purchase {
-    position: absolute;
-    bottom: 7cqw;
-    inset-inline: 7cqw;
-    text-align: center;
-  }
-
-  &__purchase p {
-    margin: 0 0 3cqw;
-    font-size: 3cqw;
-  }
-
   &__add {
-    width: 100%;
-    min-height: 44px;
-    padding: 3cqw;
-    background: #f0e9d9;
-    color: #252e48;
-    border: 0;
-    border-radius: 999px;
-    font-size: 4cqw;
-    cursor: pointer;
+    width: 100%; min-height: 44px; height: 18cqw; padding: 2cqw;
+    border: 0; border-radius: 6cqw; background: #20221f; color: #f1f1e9;
+    font-size: max(12px, 3.5cqw); transition: background-color 150ms ease, color 150ms ease, scale 150ms ease;
+    &--checkout { background: #ff6500; color: #20221f; }
+    @media (hover: hover) { &:hover { background: #ff6500; color: #20221f; } }
+    &:active { scale: .96; }
+    @media (prefers-reduced-motion: reduce) { transition: none; }
   }
-
-  &__add--checkout {
-    background: #f1d58a;
-    color: #000;
-  }
-
-  &__add:disabled {
-    opacity: .6;
-    cursor: default;
-  }
-
-  button:active:not(:disabled) {
-    transform: scale(.96);
-  }
-
-  button:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
-  }
-
-  &__sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  figcaption {
-    padding: var(--space-3) var(--space-2) 0;
-    font-size: var(--text-sm);
-    color: var(--color-text);
-  }
+  button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  figcaption { padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
 }
 
 .price-cart {

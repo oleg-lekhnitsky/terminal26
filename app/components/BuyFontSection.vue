@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { fontProducts, toggleFontSelection, type FontProductId } from '~/utils/fontShop'
 
-const { activeFont } = useFontSelection()
 const shop = useTemplateRef('shop')
 const id = useId()
 const options = fontProducts
-const selected = ref<FontProductId[]>([activeFont.value.id])
+const selected = useState<FontProductId[]>('font-cart', () => [])
 const total = computed(() => options.filter(option => selected.value.includes(option.id)).reduce((sum, option) => sum + option.price, 0))
 const fullPack = options.find(option => option.id === 'full-pack')!
 const { checkingOut, checkoutError, checkout } = useFontCheckout(() => selected.value)
@@ -16,7 +15,6 @@ function toggleSelection(product: FontProductId) {
 }
 function openShop() {
   if (!checkingOut.value) {
-    selected.value = [activeFont.value.id]
     checkoutError.value = ''
   }
   shop.value?.showModal()
