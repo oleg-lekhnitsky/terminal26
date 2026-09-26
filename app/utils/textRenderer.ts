@@ -62,7 +62,7 @@ export const textPresets = ([
   { id: 'carousel', name: 'Flip flop', text: '"|', background: '#026b2c', color: '#f652e3', aspectRatio: '22 / 23' },
   { id: 'drop', name: 'Drop', text: 'Латиница', background: '#f1f1e9', color: '#421f18', aspectRatio: '22 / 8' },
   { id: 'typewriter', name: 'Typewriter', text: '$20', background: '#252e48', color: '#f0e9d9', aspectRatio: '22 / 24' },
-  { id: 'slide', name: 'On repeat', text: 'I opened this file to fix one tiny thing. Three hours later, the letters have a new font, the cube has opinions, and I have forgotten what the tiny thing was. Anyway, look at that spacing.', background: '#b7d3cb', color: '#173d35', aspectRatio: '22 / 16' },
+  { id: 'slide', name: 'On repeat', text: 'I opened this file to fix one tiny thing. Three hours later, the letters have a new font, the cube has opinions, and I have forgotten what the tiny thing was. Anyway, look at that cards.', background: '#b7d3cb', color: '#173d35', aspectRatio: '22 / 16' },
   { id: 'fan', name: 'Fan', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', background: '#f0bed0', color: '#642a46', aspectRatio: '22 / 28' },
   { id: 'words', name: 'Word by word', text: 'Regular Bold Italic Болд Италик Регулар', background: '#b8cfee', color: '#252e48', aspectRatio: '22 / 24' },
   { id: 'numbers', name: 'Numbers', text: '0 1 2 3 4 5 6 7 8 9', background: '#db3b32', color: '#fff0d9', aspectRatio: '4 / 5' },
