@@ -5,7 +5,17 @@ export default defineNuxtConfig({
   app: {
     head: {
       viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
-      link: [{ id: 'terminal-favicon', rel: 'icon', type: 'image/png', href: '/favicon/frame-0.png' }],
+      meta: [
+        { name: 'theme-color', content: '#000000' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-title', content: 'AB Terminal' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+      ],
+      link: [
+        { id: 'terminal-favicon', rel: 'icon', type: 'image/png', href: '/favicon/frame-0.png' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/icons/apple-touch-icon.png' },
+      ],
     },
   },
   runtimeConfig: {
