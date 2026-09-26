@@ -94,8 +94,8 @@ onBeforeUnmount(() => {
       <img class="home-hero__avatar" src="/favicon/frame-0.png" width="40" height="40" alt="Alex Blohin" />
       <button class="home-hero__buy" type="button" aria-haspopup="dialog" @click="buySection?.openShop()">Buy</button>
       <div class="home-hero__content">
-        <h1>AB Terminal</h1>
-        <p>typeface by Alex Blohin</p>
+        <h1>AB Terminal Typeface</h1>
+        <p>by Alex Blohin</p>
       </div>
     </header>
     <div ref="board" class="motion-board">
@@ -115,9 +115,9 @@ onBeforeUnmount(() => {
 .home-hero {
   position: relative;
   width: 100%; min-width: 0;
-  min-height: 50svh;
+  min-height: 65svh;
   display: grid; place-items: center;
-  // padding: var(--space-8);
+  padding-block: clamp(64px, 6vw, 96px);
   text-align: center;
 
   &__avatar {
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
     &:focus-visible { outline: 2px solid #f2df64; outline-offset: 3px; }
     @media (prefers-reduced-motion: reduce) { transition: none; }
   }
-  &__content { display: grid; gap: var(--space-4); }
+  &__content { display: grid; gap: clamp(24px, 3vw, 48px); }
   p {
     margin: 0; color: var(--color-text); font-family: var(--font-sans);
     font-size: 13px; font-weight: 400; font-style: normal; opacity: .6;
@@ -143,7 +143,7 @@ onBeforeUnmount(() => {
 
   h1 {
     margin: 0; color: var(--color-text); font-family: var(--font-sans);
-    font-size: clamp(36px, 11vw, 180px); line-height: 1.1;
+    font-size: clamp(36px, 11vw, 180px); line-height: .95;
     font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     letter-spacing: -.04em;
   }

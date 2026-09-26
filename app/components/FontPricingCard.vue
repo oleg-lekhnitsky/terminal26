@@ -141,6 +141,10 @@ function navigateProducts(event: KeyboardEvent) {
     @media (prefers-reduced-motion: reduce) { transition: none; }
   }
   button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  @media (max-width: 600px) {
+    &__product { border-radius: max(0px, calc(var(--radius-xl) - 5cqw)); }
+    &__add { border-radius: max(0px, calc(var(--radius-xl) - 8cqw)); }
+  }
   figcaption { padding: var(--space-3) var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text); }
 }
 
