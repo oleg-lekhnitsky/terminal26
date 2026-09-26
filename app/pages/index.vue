@@ -91,11 +91,13 @@ onBeforeUnmount(() => {
 <template>
   <main class="home-page" :style="{ '--specimen-weight': activeFont.weight, '--specimen-style': activeFont.style }">
     <header class="home-hero">
-      <img class="home-hero__avatar" src="/favicon/frame-0.png" width="40" height="40" alt="Alex Blohin" />
-      <button class="home-hero__buy" type="button" aria-haspopup="dialog" @click="buySection?.openShop()">Buy</button>
-      <div class="home-hero__content">
-        <h1>AB Terminal Typeface</h1>
+      <div class="home-hero__author">
+        <img class="home-hero__avatar" src="/favicon/frame-0.png" width="40" height="40" alt="" />
         <p>by Alex Blohin</p>
+      </div>
+      <div class="home-hero__content">
+        <HeroHeading />
+        <button class="home-hero__buy" type="button" aria-haspopup="dialog" @click="buySection?.openShop()">Buy</button>
       </div>
     </header>
     <div ref="board" class="motion-board">
@@ -117,17 +119,17 @@ onBeforeUnmount(() => {
   width: 100%; min-width: 0;
   min-height: 65svh;
   display: grid; place-items: center;
-  padding-block: clamp(64px, 6vw, 96px);
+  grid-template-rows: auto 1fr;
+  row-gap: 64px;
+  padding-block: clamp(24px, 2vw, 40px) clamp(48px, 5vw, 80px);
   text-align: center;
 
   &__avatar {
-    position: absolute; top: 0; left: 0;
     width: 40px; height: 40px; object-fit: cover;
   }
   &__buy {
-    position: absolute; top: 0; right: 0;
-    min-height: 44px; padding: 10px 24px; border: 0; border-radius: var(--radius-full);
-    background: #eeeae3; color: #24221f; font: 400 13px var(--font-sans); cursor: pointer;
+    min-height: 56px; padding: 16px 32px; border: 0; border-radius: var(--radius-full);
+    background: #eeeae3; color: #24221f; font: 400 18px var(--font-sans); cursor: pointer;
     font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     transition: background-color 150ms ease, scale 150ms ease;
     @media (hover: hover) { &:hover { background: #daf759; } }
@@ -135,7 +137,8 @@ onBeforeUnmount(() => {
     &:focus-visible { outline: 2px solid #daf759; outline-offset: 3px; }
     @media (prefers-reduced-motion: reduce) { transition: none; }
   }
-  &__content { display: grid; gap: clamp(24px, 3vw, 48px); }
+  &__content { display: grid; justify-items: center; gap: clamp(32px, 4vw, 64px); min-width: 0; }
+  &__author { display: grid; justify-items: center; gap: 20px; }
   p {
     margin: 0; color: var(--color-text); font-family: var(--font-sans);
     font-size: 13px; font-weight: 400; font-style: normal; opacity: .6;
@@ -143,7 +146,7 @@ onBeforeUnmount(() => {
 
   h1 {
     margin: 0; color: var(--color-text); font-family: var(--font-sans);
-    font-size: clamp(36px, 11vw, 180px); line-height: .95;
+    font-size: clamp(36px, 8vw, 144px); line-height: .95;
     font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     letter-spacing: -.04em;
   }

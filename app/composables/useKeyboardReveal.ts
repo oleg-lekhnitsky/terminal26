@@ -22,8 +22,10 @@ export function useKeyboardReveal(target: Readonly<Ref<HTMLElement | null>>, act
       const bottom = (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 24
       const available = bottom - top
       if (available <= 0) return
-      // Leave already-visible text alone; oversized text boxes align at the top.
-      const delta = rect.height > available || rect.top < top
+      // A tall textarea needs native caret scrolling, not its top edge revealed.
+      // Pulling it to the top can hide the selected line behind the keyboard.
+      if (rect.height > available) return
+      const delta = rect.top < top
         ? rect.top - top
         : rect.bottom > bottom ? rect.bottom - bottom : 0
       if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' })
@@ -32,7 +34,9 @@ export function useKeyboardReveal(target: Readonly<Ref<HTMLElement | null>>, act
       clearTimeout(timer)
       timer = setTimeout(revealEditor, 300)
     }
-    scheduleReveal()
+    // Allow keyboard opening to begin before the fallback adjustment. Viewport
+    // resize events debounce this until the keyboard has settled.
+    timer = setTimeout(revealEditor, 600)
     viewport?.addEventListener('resize', scheduleReveal)
     window.addEventListener('resize', scheduleReveal)
     window.addEventListener('touchstart', stopReveal, { passive: true })

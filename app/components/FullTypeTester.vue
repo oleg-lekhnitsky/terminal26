@@ -3,6 +3,7 @@ const { activeFont } = useFontSelection()
 const id = useId()
 const editor = useTemplateRef('editor')
 const editing = ref(false)
+const settingsOpen = ref(false)
 useKeyboardReveal(editor, editing)
 const defaultText = 'Type something nice here'
 const text = ref(defaultText)
@@ -38,7 +39,12 @@ const appearance = computed(() => ({
   <section :id="`${id}-tester`" class="type-tester" aria-label="Type tester">
     <div class="type-tester__toolbar">
       <span class="type-tester__info">{{ activeFont.label }} · Latin &amp; Cyrillic</span>
-    <div class="type-tester__controls">
+      <button type="button" class="type-tester__settings-toggle"
+        :aria-expanded="settingsOpen" :aria-controls="`${id}-settings`" @click="settingsOpen = !settingsOpen">
+        <span>Text settings</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path :d="settingsOpen ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'" /></svg>
+      </button>
+    <div :id="`${id}-settings`" class="type-tester__controls" :class="{ 'is-open': settingsOpen }">
       <label class="type-tester__range">
         <span>Size <output>{{ size }} px</output></span>
         <input v-model.number="size" type="range" min="16" max="240" step="1" :aria-valuetext="`${size} pixels`"
@@ -212,6 +218,8 @@ const appearance = computed(() => ({
     gap: 8px;
   }
 
+  button.type-tester__settings-toggle { display: none; }
+
   &__caps[aria-pressed='true'] {
     background: #ede9e1;
     color: #24221f;
@@ -290,27 +298,78 @@ const appearance = computed(() => ({
 }
 
 @media (max-width: 760px) {
+  .type-tester { gap: 16px; min-height: 0; }
+
+  .type-tester__toolbar {
+    display: contents;
+  }
+
+  .type-tester__info {
+    order: 3;
+    text-align: center;
+  }
+
+  .type-tester__hint {
+    order: 4;
+    text-align: center;
+  }
+
   .type-tester__controls {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 24px;
+    display: none;
+    order: 1;
+    grid-row: 4;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 0;
+    padding-bottom: 16px;
   }
 
-  .type-tester__formatting {
-    justify-content: flex-end;
-  }
-}
+  .type-tester__controls.is-open { display: grid; }
 
-@media (max-width: 480px) {
-  .type-tester__controls {
-    gap: 12px 16px;
+  .type-tester button.type-tester__settings-toggle {
+    display: flex;
+    order: 0;
+    grid-row: 3;
+    width: 100%;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 12px;
+    text-align: left;
   }
 
-  .type-tester__range>span {
-    flex-wrap: wrap;
+  .type-tester .type-tester__range {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    padding-inline: 14px 22px;
+  }
+
+  .type-tester__range > span {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
   }
 
+  .type-tester__range output {
+    font-size: 11px;
+  }
 
+  .type-tester__formatting {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin-top: 0;
+  }
+
+  .type-tester__text {
+    order: 2;
+    flex: none;
+    height: clamp(240px, 45svh, 420px);
+    min-height: 0;
+    padding: 0;
+    resize: none;
+    overflow-y: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
