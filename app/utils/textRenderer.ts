@@ -60,7 +60,7 @@ export const textPresets = ([
   { id: 'rise', name: 'Rise', text: 'Hello{', background: '#ede9e1', color: '#24221f', aspectRatio: '22 / 12' },
   { id: 'letter', name: 'One at a time', text: oneShotText('bold'), background: '#d5ef72', color: '#263219', aspectRatio: '22 / 28' },
   { id: 'carousel', name: 'Flip flop', text: '"|', background: '#038249', color: '#7c15cc', aspectRatio: '22 / 23' },
-  { id: 'drop', name: 'Drop', text: 'Латиница', background: '#ed754e', color: '#421f18', aspectRatio: '22 / 8' },
+  { id: 'drop', name: 'Drop', text: 'Латиница', background: '#f1f1e9', color: '#421f18', aspectRatio: '22 / 8' },
   { id: 'typewriter', name: 'Typewriter', text: '$20', background: '#252e48', color: '#f0e9d9', aspectRatio: '22 / 24' },
   { id: 'slide', name: 'On repeat', text: 'I opened this file to fix one tiny thing. Three hours later, the letters have a new font, the cube has opinions, and I have forgotten what the tiny thing was. Anyway, look at that spacing.', background: '#b7d3cb', color: '#173d35', aspectRatio: '22 / 16' },
   { id: 'fan', name: 'Fan', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', background: '#f0bed0', color: '#642a46', aspectRatio: '22 / 28' },

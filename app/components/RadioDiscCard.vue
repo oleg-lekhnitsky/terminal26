@@ -111,12 +111,11 @@ onBeforeUnmount(() => { disposed = true; stop(); observer?.disconnect(); documen
         <p role="status">{{ message || (state === 'buffering' ? 'Tuning in…' : state === 'playing' ? `${station?.country} / Live radio` : 'Choose a station. Press play.') }}</p>
       </div>
       <div class="radio-pin__controls">
-        <button type="button" aria-label="Previous radio station" :disabled="!stations.length" @click="select(index - 1)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 5 8 12l10 7Z" /></svg></button>
+        <button type="button" aria-label="Previous radio station" :disabled="!stations.length" @click="select(index - 1)"><PixelPlaybackIcon kind="previous" /></button>
         <button class="radio-pin__play" type="button" :aria-label="state === 'playing' || state === 'buffering' ? 'Stop radio' : 'Play radio'" :disabled="!stations.length" @click="toggle">
-          <svg v-if="state === 'playing' || state === 'buffering'" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3v14H7ZM14 5h3v14h-3Z" /></svg>
-          <svg v-else viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z" /></svg>
+          <PixelPlaybackIcon :kind="state === 'playing' || state === 'buffering' ? 'pause' : 'play'" />
         </button>
-        <button type="button" aria-label="Next radio station" :disabled="!stations.length" @click="select(index + 1)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M6 5l10 7-10 7Z" /></svg></button>
+        <button type="button" aria-label="Next radio station" :disabled="!stations.length" @click="select(index + 1)"><PixelPlaybackIcon kind="next" /></button>
       </div>
       <label class="radio-pin__volume"><span>VOL</span><input v-model.number="volume" type="range" min="0" max="1" step=".05" aria-label="Radio volume"><span>{{ Math.round(volume * 100) }}</span></label>
       <button v-if="!loading && !stations.length" class="radio-pin__retry" type="button" @click="loadStations">Retry stations</button>
@@ -145,7 +144,14 @@ onBeforeUnmount(() => { disposed = true; stop(); observer?.disconnect(); documen
   button svg { width: 22px; height: 22px; fill: currentColor; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
   &__play { width: 14cqw; height: 14cqw; background: #222722 !important; color: #f3f3eb !important; border-radius: 50%; }
   &__volume { display: grid; grid-template-columns: 3ch 38% 3ch; align-items: center; justify-content: center; gap: 3cqw; margin: 4cqw auto 0; font-size: 2.5cqw; font-style: normal; font-weight: 400; }
-  &__volume input { width: 100%; margin: 0; min-width: 0; accent-color: #485b50; height: 24px; cursor: pointer; }
+  &__volume input {
+    appearance: none; width: 100%; margin: 0; min-width: 0; height: 44px;
+    background: transparent; color: #222722; cursor: pointer;
+    &::-webkit-slider-runnable-track { height: 3px; background: repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px); }
+    &::-moz-range-track { height: 3px; background: repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px); }
+    &::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; margin-top: -4.5px; border: 0; border-radius: 2px; background: currentColor; }
+    &::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 2px; background: currentColor; }
+  }
   &__volume > span:first-child { text-align: right; }
   &__volume > span:last-child { text-align: left; font-variant-numeric: tabular-nums; }
   &__retry { margin: .5rem auto 0; font: inherit; text-decoration: underline; }
