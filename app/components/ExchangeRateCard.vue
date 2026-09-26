@@ -73,8 +73,8 @@ onBeforeUnmount(() => {
     aspect-ratio: 4 / 5;
     overflow: hidden;
     border-radius: var(--radius-xl);
-    background: #03963e;
-    color: #b10f76;
+    background: #026b2c;
+    color: #91d90a;
     text-align: center;
     font-family: var(--font-sans);
     font-weight: var(--specimen-weight, 700);

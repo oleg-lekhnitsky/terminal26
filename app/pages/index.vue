@@ -183,15 +183,12 @@ onBeforeUnmount(() => {
 
 .home-page {
   background-color: var(--deslop-base-background);
-  background-image: radial-gradient(var(--deslop-primary-10) 0.7px, transparent 0.7px);
-  background-size: 64px 64px;
   min-width: 0;
   min-height: 100dvh;
   display: grid;
   row-gap: 0;
   position: relative;
   container-type: inline-size;
-  background-position: -4px -4px;
   align-items: start;
   justify-items: center;
   padding: var(--space-3);

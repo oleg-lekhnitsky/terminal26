@@ -71,12 +71,10 @@ function changeStyle(direction: number) {
     <dialog ref="dialog" class="price-cart" :aria-labelledby="cartTitleId" @click.self="dialog?.close()">
       <div class="price-cart__inner">
         <button class="price-cart__close" type="button" aria-label="Close cart" @click="dialog?.close()">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 6 12 12M18 6 6 18" />
-          </svg>
+          <PixelCloseIcon />
         </button>
         <header class="price-cart__heading">
-          <h2 :id="cartTitleId">AB TERMINAL</h2>
+          <h2 :id="cartTitleId" tabindex="-1" autofocus>AB TERMINAL</h2>
           <p>TYPE FOUNDRY / FONT SHOP</p>
           <span>YOUR CART</span>
         </header>
@@ -340,6 +338,7 @@ function changeStyle(direction: number) {
     font-weight: 700;
     line-height: 1.1;
   }
+  h2:focus { outline: none; }
 
   &__heading p {
     margin: .6rem 0 1.5rem;

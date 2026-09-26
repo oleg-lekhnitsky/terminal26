@@ -58,7 +58,7 @@ function draw() {
   shape.lineJoin = 'round'
 
   // Interpolate observed poses, rather than giving each leg an independent swing.
-  function leg(front: boolean, far: boolean) {
+  const leg = (front: boolean, far: boolean) => {
     const limb = (front ? 2 : 0) + (far ? 0 : 1)
     const from = stridePoses[poseIndex]![limb]!
     const to = stridePoses[nextPose]![limb]!

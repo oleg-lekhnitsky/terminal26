@@ -12,3 +12,8 @@ export function addFontToCart(cart: FontProductId[], product: FontProductId): Fo
   if (cart.includes('full-pack')) return cart
   return [...cart, product]
 }
+
+export function toggleFontSelection(selected: FontProductId[], product: FontProductId): FontProductId[] {
+  if (selected.includes(product)) return selected.filter(id => id !== product)
+  return addFontToCart(selected.filter(id => id !== 'full-pack'), product)
+}
