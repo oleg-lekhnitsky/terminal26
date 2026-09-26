@@ -4,7 +4,7 @@ import { motionSystem } from '~/utils/textRenderer'
 const { activeFont } = useFontSelection()
 const alphabets = [
   { label: 'LATIN', text: 'Aa Bb Cc Dd\nEe Ff Gg Hh\nIi Jj Kk Ll\nMm Nn Oo Pp\nQq Rr Ss Tt\nUu Vv Ww\nXx Yy Zz' },
-  { label: 'CYRILLIC', text: 'Аа Бб Вв Гг\nДд Ее Ёё Жж\nЗз Ии Йй Кк\nЛл Мм Нн Оо\nПп Рр Сс Тт\nУу Фф Хх Цц\nЧч Шш Щщ\nЪъ Ыы Ьь\nЭэ Юю Яя' },
+  { label: 'CYRILLIC', text: 'Аа Бб Вв Гг\nДд Ее Ёё Жж\nЗз Ии Йй Кк\nЛл Мм Нн Оо\nПп Рр Сс Тт\nУу Ўў Фф Хх\nЦц Чч Шш Щщ\nЪъ Ыы Ьь\nЭэ Юю Яя' },
 ] as const
 const alphabetIndex = ref(0)
 const alphabet = computed(() => alphabets[alphabetIndex.value]!)

@@ -20,6 +20,17 @@ onMounted(() => {
 })
 onBeforeUnmount(() => window.removeEventListener('resize', syncDefaultSize))
 const tracking = ref(-.02)
+// Repeating checkerboard tiles need their exact advance, without text tracking.
+// Update the control itself so its displayed value matches the rendered text.
+let previousTracking = tracking.value
+watch(() => text.value.includes('thetaxi') || text.value.includes('\uE004'), (hasTaxi) => {
+  if (hasTaxi) {
+    previousTracking = tracking.value
+    tracking.value = 0
+  } else if (tracking.value === 0) {
+    tracking.value = previousTracking
+  }
+})
 const leading = ref(1.05)
 const alignment = ref<'left' | 'center' | 'right'>('center')
 const alignments = ['left', 'center', 'right'] as const
@@ -254,7 +265,9 @@ const appearance = computed(() => ({
     width: 100%;
     min-width: 0;
     min-height: 35svh;
-    padding: 4px;
+    // Tall pictograms extend beyond the normal line box.
+    padding: .4em 4px;
+    box-sizing: border-box;
     margin: 0;
     resize: vertical;
     border: 0;
@@ -263,6 +276,8 @@ const appearance = computed(() => ({
     color: inherit;
     font-family: var(--font-sans);
     overflow-wrap: anywhere;
+    font-kerning: normal;
+    font-feature-settings: 'liga' 1;
     caret-color: #daf759;
 
     &:focus {
@@ -366,7 +381,7 @@ const appearance = computed(() => ({
     flex: none;
     height: clamp(240px, 45svh, 420px);
     min-height: 0;
-    padding: 0;
+    padding: .4em 4px;
     resize: none;
     overflow-y: auto;
   }

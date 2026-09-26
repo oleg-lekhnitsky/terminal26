@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { renderBudget } from './renderBudget.ts'
 import { configureTextFont, centeredTextBaseline, flow, type TextAppearance } from './textRenderer.ts'
+import { resolveFontSymbols } from './fontSymbols.ts'
 
 // Local Figma Library: Flip Flop / Flip 01 (test-01).
 export const flipFlopPreset = Object.freeze({
@@ -83,7 +84,7 @@ export function createFlipFlopRenderer(canvas: HTMLCanvasElement) {
   }
   return {
     updateFont(appearance: TextAppearance, background: string) {
-      const letters = Array.from(appearance.text.toUpperCase().replace(/\s/g, '')).slice(0, flipFlopPreset.count)
+      const letters = Array.from(resolveFontSymbols(appearance.text).toUpperCase().replace(/\s/g, '')).slice(0, flipFlopPreset.count)
       if (!letters.length) letters.push('A')
       if (letters.length === 1) letters.push(letters[0]!)
       const next = letters.map((letter, index) => {

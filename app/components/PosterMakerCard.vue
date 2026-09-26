@@ -404,7 +404,8 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
   const size = typeSize.value
   context.font = `${font.style} ${font.weight} ${size}px "AB Terminal"`
   const lines = wrap(context, displayTitle.value || 'Your poster', textWidth.value)
-  const blockHeight = lines.length * size * lineHeight.value
+  // Match the textarea’s .4em top and bottom padding in preview and export.
+  const blockHeight = lines.length * size * lineHeight.value + size * .8
   const boxHeight = textBoxHeight.value ?? blockHeight
   const top = (height - boxHeight) / 2
   context.textAlign = alignment.value
@@ -416,7 +417,7 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
     for (const layer of layers) {
       context.font = `${layer.font.style} ${layer.font.weight} ${layer.size}px "AB Terminal"`
       const layerLines = wrap(context, layer.caps ? layer.title.toUpperCase() : layer.title, layer.width)
-      const layerHeight = layer.boxHeight ?? layerLines.length * layer.size * layer.lineHeight
+      const layerHeight = layer.boxHeight ?? layerLines.length * layer.size * layer.lineHeight + layer.size * .8
       const layerTop = (height - layerHeight) / 2
       const x = layer.alignment === 'left' ? (960 - layer.width) / 2 : layer.alignment === 'right' ? (960 + layer.width) / 2 : 480
       context.save()
@@ -433,7 +434,7 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
       const ascent = metrics.fontBoundingBoxAscent ?? layer.size * .8
       const descent = metrics.fontBoundingBoxDescent ?? layer.size * .2
       const baseline = (layer.size * layer.lineHeight - ascent - descent) / 2 + ascent
-      layerLines.forEach((line, i) => context.fillText(line, x, layerTop + baseline + i * layer.size * layer.lineHeight))
+      layerLines.forEach((line, i) => context.fillText(line, x, layerTop + layer.size * .4 + baseline + i * layer.size * layer.lineHeight))
       context.restore()
     }
     context.textBaseline = 'top'
@@ -627,9 +628,9 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__heading { position: absolute; top: 5cqw; inset-inline: 7cqw; display: flex; justify-content: space-between; align-items: center; font-size: 2.5cqw; font-weight: 400; font-style: normal; }
   button { font: inherit; color: inherit; border: 0; background: transparent; cursor: pointer; min-height: 44px; }
   &__heading button { padding: 0; }
-  &__type { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: move; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font-family: inherit; font-weight: inherit; font-style: inherit; line-height: 1.08; text-align: center; margin: 0; appearance: none; letter-spacing: 0; resize: none; overflow: auto; scrollbar-width: none; border-radius: 0; }
+  &__type { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: move; padding: .4em 0; box-sizing: border-box; border: 0; outline: 0; background: transparent; color: inherit; font-family: inherit; font-weight: inherit; font-style: inherit; line-height: 1.08; text-align: center; margin: 0; appearance: none; letter-spacing: 0; resize: none; overflow: auto; scrollbar-width: none; border-radius: 0; }
   &__text-object { position: absolute; left: 8.333%; width: 83.334%; transform-origin: center; }
-  &__saved-text { position: absolute; padding: 0; margin: 0; border: 0; outline: 0; border-radius: 0; background: transparent; font-family: inherit; resize: none; overflow: hidden; cursor: text; transform-origin: center; }
+  &__saved-text { position: absolute; padding: .4em 0; box-sizing: border-box; margin: 0; border: 0; outline: 0; border-radius: 0; background: transparent; font-family: inherit; resize: none; overflow: hidden; cursor: text; transform-origin: center; }
   &__saved-text:hover { outline: 1px dashed #fff; }
   &__type::placeholder { color: inherit; opacity: .6; }
   &__type::-webkit-scrollbar { display: none; }

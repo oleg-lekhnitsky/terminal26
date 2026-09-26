@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { createFrameGate, renderBudget } from '~/utils/renderBudget'
+import { resolveFontSymbols } from '~/utils/fontSymbols'
 import { createTextRenderer, motionSystem, typographySystem, isContinuousPreset, sequenceFrame, type TextPreset } from '~/utils/textRenderer'
 
 const props = withDefaults(defineProps<{
@@ -207,7 +208,7 @@ onBeforeUnmount(() => {
     class="webgl-text"
     :style="{ color, fontFamily, fontWeight, fontStyle, letterSpacing: `${Number.isFinite(letterSpacing) ? letterSpacing : 0}em` }"
   >
-    <span :class="ready ? 'sr-only' : 'webgl-text__fallback'">{{ text }}</span>
+    <span :class="ready ? 'sr-only' : 'webgl-text__fallback'">{{ resolveFontSymbols(text) }}</span>
     <canvas ref="canvas" aria-hidden="true" :class="{ 'is-ready': ready }" />
   </div>
 </template>

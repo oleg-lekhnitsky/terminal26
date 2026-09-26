@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { createFrameGate, renderBudget } from '~/utils/renderBudget'
 import { typographySystem } from '~/utils/textRenderer'
+import { resolveFontSymbols } from '~/utils/fontSymbols'
 import type { createFlipFlopRenderer } from '~/utils/flipFlopRenderer'
 
 const props = defineProps<{ text: string; color: string; background: string }>()
@@ -107,7 +108,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="host" class="flip-flop" role="img" :aria-label="`${text}: flipping uppercase letters, ${activeFont.label}`">
-    <span v-if="!ready" class="flip-flop__fallback">{{ text.toUpperCase() }}</span>
+    <span v-if="!ready" class="flip-flop__fallback">{{ resolveFontSymbols(text).toUpperCase() }}</span>
     <canvas ref="canvas" aria-hidden="true" :class="{ 'is-ready': ready }" />
   </div>
 </template>
