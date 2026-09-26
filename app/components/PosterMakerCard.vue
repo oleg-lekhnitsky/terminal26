@@ -633,7 +633,11 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
   &__saved-text:hover { outline: 1px dashed #fff; }
   &__type::placeholder { color: inherit; opacity: .6; }
   &__type::-webkit-scrollbar { display: none; }
-  &__type.is-editing { cursor: text; touch-action: auto; }
+  &__type.is-editing {
+    cursor: text;
+    touch-action: none;
+    overscroll-behavior: contain;
+  }
   &__text-object { outline: 1px dashed transparent; }
   &__text-object:hover, &__text-object:focus-within, &__text-object.is-active { outline-color: currentColor; }
   &__edge, &__resize { opacity: 0; }
