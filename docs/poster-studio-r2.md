@@ -20,6 +20,8 @@ NUXT_SITE_URL=http://localhost:3000
 
 Use your actual HTTPS origin for `NUXT_SITE_URL` on the deployed site. Restart the dev server or redeploy after changing server environment variables. Never put the R2 credentials in public runtime config.
 
+Poster publishing accepts the configured `NUXT_SITE_URL` origin and `https://terminal.designdep.work`.
+
 Official setup: [R2 S3 API](https://developers.cloudflare.com/r2/get-started/s3/), [R2 API tokens](https://developers.cloudflare.com/r2/api/tokens/).
 
 ## Verify
