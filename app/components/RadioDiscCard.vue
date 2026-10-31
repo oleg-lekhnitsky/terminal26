@@ -86,7 +86,7 @@ onBeforeUnmount(() => { disposed = true; stop(); observer?.disconnect(); documen
 
 <template>
   <figure ref="host" class="radio-pin">
-    <div class="radio-pin__art" :style="{ fontWeight: activeFont.weight, fontStyle: activeFont.style }">
+    <div class="radio-pin__art" :style="{ fontFamily: activeFont.family, fontWeight: activeFont.weight, fontStyle: activeFont.style }">
       <header class="radio-pin__header"><span>TERMINAL / RADIO</span><span>{{ state === 'playing' ? 'ON AIR' : 'FM / 01' }}</span></header>
       <div class="radio-case" aria-hidden="true">
         <div class="radio-case__hinge" />

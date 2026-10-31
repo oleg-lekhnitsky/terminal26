@@ -52,7 +52,7 @@ function advanceWord() {
         :letter-spacing="preset.letterSpacing"
         :whole-text="preset.id === 'words'"
         :speed="1"
-        :font-weight="specimenFont.weight"
+        :font-family="specimenFont.family" :font-weight="specimenFont.weight"
         :font-style="specimenFont.style"
         @cycle-complete="advanceWord"
         loop

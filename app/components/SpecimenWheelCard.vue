@@ -43,11 +43,11 @@ async function loadFont() {
   const request = ++fontRequest
   const font = activeFont.value
   try {
-    await document.fonts.load(`${font.style} ${font.weight} 100px ${typographySystem.fontFamily}`, 'AB TERMINAL Aa')
+    await document.fonts.load(`${font.style} ${font.weight} 100px ${font.family}`, 'AB TERMINAL Aa')
   } catch { /* Keep the available fallback font. */ }
   if (disposed || request !== fontRequest || !renderer) return
   renderer.updateFont({
-    text: 'AB TERMINAL Aa', fontFamily: typographySystem.fontFamily,
+    text: 'AB TERMINAL Aa', fontFamily: font.family,
     fontWeight: font.weight, fontStyle: font.style,
     letterSpacing: typographySystem.letterSpacing, color: '#242522',
   })
@@ -142,7 +142,7 @@ onBeforeUnmount(() => {
     text-align: center;
     color: #f3eedf;
     font-family: var(--font-sans);
-    font-weight: var(--specimen-weight, 700);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
     font-size: 10cqw;
   }

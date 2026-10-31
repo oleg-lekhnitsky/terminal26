@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
   overflow: visible;
   font-family: var(--font-sans);
   font-size: 9px;
-  font-weight: var(--specimen-weight, 700);
+  font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
   font-style: var(--specimen-style, normal);
   fill: currentColor;
 

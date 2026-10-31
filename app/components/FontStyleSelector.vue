@@ -72,16 +72,16 @@ onBeforeUnmount(() => {
 <template>
   <div ref="host" class="font-selector" :style="{ '--selector-duration': `${motionSystem.enter / 4}s` }" @focusout="focusout">
     <div class="font-selector__desktop" role="group" aria-label="Font style">
-      <button v-for="font in fontVariants" :key="font.id" type="button" class="font-selector__button" :aria-pressed="selectedFont === font.id" :style="{ fontWeight: font.weight, fontStyle: font.style }" @click="selectStyle(font.id)">{{ font.label }}</button>
+      <button v-for="font in fontVariants" :key="font.id" type="button" class="font-selector__button" :aria-pressed="selectedFont === font.id" :style="{ fontFamily: font.family, fontWeight: font.weight, fontStyle: font.style }" @click="selectStyle(font.id)">{{ font.label }}</button>
     </div>
     <div class="font-selector__mobile">
-      <button ref="trigger" type="button" class="font-selector__button font-selector__trigger" :aria-expanded="open" :aria-controls="menuId" :aria-label="`Font style: ${activeFont.label}`" :style="{ fontWeight: activeFont.weight, fontStyle: activeFont.style }" @click="toggle">
+      <button ref="trigger" type="button" class="font-selector__button font-selector__trigger" :aria-expanded="open" :aria-controls="menuId" :aria-label="`Font style: ${activeFont.label}`" :style="{ fontFamily: activeFont.family, fontWeight: activeFont.weight, fontStyle: activeFont.style }" @click="toggle">
         {{ activeFont.label }}
         <svg viewBox="0 0 16 16" aria-hidden="true" :class="{ 'is-open': open }"><path d="m4 10 4-4 4 4" /></svg>
       </button>
       <Transition name="font-menu">
         <div v-if="open" :id="menuId" ref="menu" class="font-selector__menu" role="group" aria-label="Font style" @keydown="navigate">
-          <button v-for="font in fontVariants" :key="font.id" type="button" class="font-selector__option" :aria-pressed="selectedFont === font.id" :style="{ fontWeight: font.weight, fontStyle: font.style }" @click="choose(font.id)">{{ font.label }}<span v-if="selectedFont === font.id" aria-hidden="true">✓</span></button>
+          <button v-for="font in fontVariants" :key="font.id" type="button" class="font-selector__option" :aria-pressed="selectedFont === font.id" :style="{ fontFamily: font.family, fontWeight: font.weight, fontStyle: font.style }" @click="choose(font.id)">{{ font.label }}<span v-if="selectedFont === font.id" aria-hidden="true">✓</span></button>
         </div>
       </Transition>
     </div>
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
 .font-menu-enter-active, .font-menu-leave-active { transition: opacity var(--selector-duration) var(--ease-flow), transform var(--selector-duration) var(--ease-flow); }
 .font-menu-enter-from, .font-menu-leave-to { opacity: 0; transform: translate(-50%, 8px); }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .font-selector__desktop { display: none; }
   .font-selector__mobile { display: block; }
 }

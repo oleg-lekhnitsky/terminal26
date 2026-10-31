@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { navigationHaptic } = useNavigationHaptics()
+const { activeFont } = useFontSelection()
 import type Hls from 'hls.js'
 import { motionSystem, typographySystem } from '~/utils/textRenderer'
 
@@ -166,7 +167,7 @@ onBeforeUnmount(() => {
         @waiting="status = `${city.name} · Buffering…`" />
       <div class="camera-pin__scrim" />
       <p class="camera-pin__status">{{ status }}</p>
-      <div class="camera-pin__type" :style="{ fontSize: `${Math.min(28, 110 / city.name.length)}cqw` }">{{ city.name }}</div>
+      <div class="camera-pin__type" :style="{ fontSize: `${Math.min(28, 110 / city.name.length) * (activeFont.id.startsWith('condensed') ? 1.3 : 1)}cqw` }">{{ city.name }}</div>
       <button v-if="needsPlay" class="camera-pin__play" type="button" @click="play">Play live camera</button>
       <div class="camera-pin__location">{{ city.location }}<br>{{ city.country }}</div>
       <button class="camera-pin__nav camera-pin__nav--previous" type="button" aria-label="Previous camera" @click="nextCity(-1); navigationHaptic()" />
@@ -187,7 +188,7 @@ onBeforeUnmount(() => {
   &__status { position: absolute; top: 5cqw; left: 5cqw; right: 5cqw; margin: 0; font-size: 2.7cqw; line-height: 1.4; text-align: center; }
   &__type {
     position: absolute; inset: 0; display: grid; place-content: center;
-    font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal);
+    font-family: var(--font-sans); font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal);
     font-size: 19cqw; line-height: 0.95; letter-spacing: var(--camera-tracking); text-align: center;
     color: #daf759; pointer-events: none;
   }

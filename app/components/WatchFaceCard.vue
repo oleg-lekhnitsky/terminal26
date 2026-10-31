@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
   &__digits {
     font-family: var(--font-sans);
     font-size: var(--watch-digit-size, 137px);
-    font-weight: var(--specimen-weight, 700);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
     font-variant-numeric: tabular-nums;
     &--hours { fill: #dddde0; }

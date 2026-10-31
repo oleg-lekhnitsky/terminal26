@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
       <div class="cube-pin__scene" aria-hidden="true">
         <div ref="cube" class="letter-cube" :style="{ letterSpacing: `${typographySystem.letterSpacing}em` }">
           <div v-for="(pair, index) in faces" :key="index" class="letter-cube__face" :class="`letter-cube__face--${index}`">
-            {{ pair }}
+            <span class="letter-cube__letters">{{ pair }}</span>
           </div>
         </div>
       </div>
@@ -162,11 +162,13 @@ onBeforeUnmount(() => {
   transform: rotateX(0deg) rotateY(0deg);
   font-family: var(--font-sans);
   font-size: 26cqw;
-  font-weight: var(--specimen-weight, 700);
+  font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
   font-style: var(--specimen-style, normal);
   line-height: 1;
   font-kerning: normal;
   color: #080909;
+
+  &__letters { transform: translateY(-.04em); }
 
   &__face {
     position: absolute;

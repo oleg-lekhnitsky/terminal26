@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
   }
 
   &__menu {
-    font-weight: var(--specimen-weight, 700);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
     letter-spacing: -.035em;
     fill: #f1f1e9;

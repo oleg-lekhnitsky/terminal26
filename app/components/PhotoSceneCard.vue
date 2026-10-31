@@ -12,7 +12,7 @@ const scenes = [
 ] as const
 const scene = computed(() => scenes[index.value]!)
 const src = (id: string) => `/images/flash-scenes/${id}.jpg`
-const typeSize = computed(() => `${Math.min(30, 82 / (scene.value.label.length * .65 + (activeFont.value.style === 'italic' ? .4 : 0)))}cqw`)
+const typeSize = computed(() => `${Math.min(30, 82 / (scene.value.label.length * .65 + (activeFont.value.style === 'italic' ? .4 : 0))) * (activeFont.value.id.startsWith('condensed') ? 1.3 : 1)}cqw`)
 const failed = ref(false)
 let observer: IntersectionObserver | undefined
 let reduced: MediaQueryList | undefined
@@ -73,7 +73,7 @@ onBeforeUnmount(() => {
 
 <template>
   <figure ref="host" class="photo-pin">
-    <div class="photo-pin__art" :style="{ fontWeight: activeFont.weight, fontStyle: activeFont.style }"
+    <div class="photo-pin__art" :style="{ fontFamily: activeFont.family, fontWeight: activeFont.weight, fontStyle: activeFont.style }"
       @mouseenter="setHover(true)" @mouseleave="setHover(false)" @focusin="setFocus(true)" @focusout="setFocus(false)"
       @keydown.left.prevent="change(-1)" @keydown.right.prevent="change(1)">
       <Transition name="photo-fade">

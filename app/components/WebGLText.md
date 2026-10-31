@@ -75,7 +75,7 @@ Word layouts use kerned prefix measurements at the final font size, preserving k
 
 SSR and unavailable/lost WebGL contexts show HTML text. Reduced-motion preferences show a static composition. Hidden tabs and offscreen cards suspend playback; unmount releases GPU resources, observers, listeners, and animation frames.
 
-The project font is bundled locally from `app/assets/fonts/AB_Terminal-Bold.ttf` via `_fonts.scss`. CSS uses `--font-sans`; canvas defaults use `typographySystem.fontFamily` and `fontWeight`. WebGL textures are rebuilt after the font finishes loading. Regular, Italic, Bold, and Bold Italic are bundled. The board selector uses `useFontSelection()` to update WebGL font weight/style and CSS/SVG specimen variables together. The default selection is Bold.
+The project font is bundled locally from `app/assets/fonts/AB_Terminal-Bold.ttf` via `_fonts.scss`. CSS uses `--font-sans`; canvas defaults use `typographySystem.fontFamily` and `fontWeight`. WebGL textures are rebuilt after the font finishes loading. Regular, Italic, Bold, and Bold Italic are bundled in standard and Condensed widths. The board selector uses `useFontSelection()` to update WebGL font family/weight/style and CSS/SVG specimen variables together. The default selection is Bold.
 
 The collage camera follows a closed four-stop path across a repeated paper field. Each pan uses Flow over four times the preset duration, then the shared hold. Neighboring patches reuse textures, with offscreen cards culled by their diagonal bounds. Reduced motion freezes the camera at its starting composition.
 

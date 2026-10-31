@@ -422,7 +422,7 @@ export function createTextRenderer(canvas: HTMLCanvasElement) {
         const measured = measureTextLayout(graphemes, value => context.measureText(value).width, single)
         const fitWidth = Math.max(measured.width, 1)
         const widthFraction = appearance.preset === 'letter' ? oneShotSystem.scale : appearance.preset === 'numbers' ? 0.92 : poster ? 0.86 : appearance.preset === 'fan' ? 0.5 : appearance.preset === 'carousel' ? 0.42 : 0.78
-        const heightFraction = appearance.preset === 'letter' ? oneShotSystem.scale : appearance.preset === 'numbers' ? 0.95 : multiline ? 0.78 / (Math.max(1, graphemes.length) * (paragraph ? 1.35 : 1)) : single ? 0.52 : 0.42
+        const heightFraction = appearance.preset === 'letter' ? oneShotSystem.scale : appearance.preset === 'numbers' ? 0.95 : multiline ? 0.78 / (Math.max(1, graphemes.length) * (paragraph ? 1.35 : 1)) : single ? 0.52 : appearance.preset === 'drop' && appearance.fontFamily.includes('AB Terminal Condensed') ? 0.55 : 0.42
         fontSize = Math.min(canvas.width * widthFraction / fitWidth * 100, canvas.height * heightFraction)
         if (appearance.preset === 'carousel') {
           const viewportHeight = 2 * carousel18.cameraDistance * Math.tan(18 * Math.PI / 180)

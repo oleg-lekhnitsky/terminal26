@@ -45,11 +45,11 @@ async function loadFont() {
   const request = ++fontRequest
   const font = activeFont.value
   try {
-    await document.fonts.load(`${font.style} ${font.weight} 100px ${typographySystem.fontFamily}`, 'AB TERMINAL Aa')
+    await document.fonts.load(`${font.style} ${font.weight} 100px ${font.family}`, 'AB TERMINAL Aa')
   } catch { /* Keep the available fallback font. */ }
   if (disposed || request !== fontRequest || !renderer) return
   renderer.updateFont({
-    text: props.text, fontFamily: typographySystem.fontFamily,
+    text: props.text, fontFamily: font.family,
     fontWeight: font.weight, fontStyle: font.style,
     letterSpacing: typographySystem.letterSpacing, color: props.color,
   }, props.background)

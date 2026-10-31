@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
     background: #10181a;
     color: #daf759;
     font-family: var(--font-sans);
-    font-weight: var(--specimen-weight, 700);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
     letter-spacing: var(--flight-tracking);
   }

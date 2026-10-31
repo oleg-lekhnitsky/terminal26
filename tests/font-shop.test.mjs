@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { addFontToCart, fontProducts, toggleFontSelection } from '../app/utils/fontShop.ts'
 
 test('each font style is $15 and the full pack is $40', () => {
-  assert.equal(fontProducts.length, 5)
+  assert.equal(fontProducts.length, 9)
   assert.ok(fontProducts.filter(item => item.id !== 'full-pack').every(item => item.price === 15))
   assert.equal(fontProducts.find(item => item.id === 'full-pack').price, 40)
 })

@@ -6,7 +6,7 @@ root = Path(__file__).resolve().parents[1]
 source = root / 'app/assets/fonts'
 target = root / 'server/font-downloads'
 target.mkdir(parents=True, exist_ok=True)
-styles = {'regular': 'Regular', 'italic': 'Italic', 'bold': 'Bold', 'bold-italic': 'Bold-Italic'}
+styles = {'regular': 'Regular', 'italic': 'Italic', 'bold': 'Bold', 'bold-italic': 'Bold-Italic', 'condensed': 'Condensed', 'condensed-italic': 'Condensed_Italic', 'condensed-bold': 'Condensed_Bold', 'condensed-bold-italic': 'Condensed_Bold_italic'}
 products = {key: [style] for key, style in styles.items()}
 products['full-pack'] = list(styles.values())
 products['test-font'] = ['Regular']

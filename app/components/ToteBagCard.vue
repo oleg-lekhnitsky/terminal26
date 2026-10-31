@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
 
 <template>
   <figure ref="host" class="tote-pin">
-    <div class="tote-pin__art" :style="{ background: bag.background, color: bag.ink, fontWeight: activeFont.weight, fontStyle: activeFont.style }"
+    <div class="tote-pin__art" :style="{ background: bag.background, color: bag.ink, fontFamily: activeFont.family, fontWeight: activeFont.weight, fontStyle: activeFont.style }"
       @mouseenter="pause(true)" @mouseleave="pause(false)" @focusin="pause(true)" @focusout="pause(false)"
       @keydown.left.prevent="change(-1)" @keydown.right.prevent="change(1)">
       <div class="tote-pin__heading" aria-hidden="true"><span>AB TERMINAL / CARRIERS</span><span>{{ bag.number }} / {{ String(bags.length).padStart(2, '0') }}</span></div>

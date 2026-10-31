@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .micro-pin {
   margin: 0 0 var(--space-6); break-inside: avoid;
-  &__art { position: relative; container-type: inline-size; aspect-ratio: 4 / 5; border-radius: var(--radius-xl); overflow: hidden; background: var(--micro-bg); color: var(--micro-ink); font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); letter-spacing: var(--micro-tracking); }
+  &__art { position: relative; container-type: inline-size; aspect-ratio: 4 / 5; border-radius: var(--radius-xl); overflow: hidden; background: var(--micro-bg); color: var(--micro-ink); font-family: var(--font-sans); font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); letter-spacing: var(--micro-tracking); }
   &__stage { position: absolute; inset: 0; display: grid; place-items: center; }
   &__mark { position: relative; width: 78cqw; text-align: left; font-size: 2cqw; line-height: 1.5; }
   &__mark::before, &__mark::after { content: '+'; position: absolute; font-size: 3cqw; line-height: 1; }

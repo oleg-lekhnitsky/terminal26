@@ -129,7 +129,7 @@ function draw() {
   const columns = Math.round(72 - 44 * amount)
   const rows = Math.round(columns * 5 / 6)
   const fontSize = 600 / columns * 1.08
-  context.font = `${activeFont.value.style} ${activeFont.value.weight} ${fontSize}px "AB Terminal"`
+  context.font = `${activeFont.value.style} ${activeFont.value.weight} ${fontSize}px ${activeFont.value.family}`
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   context.fillStyle = '#203d35'
@@ -164,7 +164,7 @@ watch(activeFont, async (font, _, onCleanup) => {
   if (!import.meta.client) return
   let cancelled = false
   onCleanup(() => { cancelled = true })
-  await document.fonts.load(`${font.style} ${font.weight} 12px "AB Terminal"`, ramp)
+  await document.fonts.load(`${font.style} ${font.weight} 12px ${font.family}`, ramp)
   if (!cancelled) draw()
 }, { immediate: true })
 onMounted(() => {

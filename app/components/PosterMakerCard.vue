@@ -181,7 +181,7 @@ const textLayout = ref({ top: 35, fontSize: 15, height: 45 })
 function openGallery() { stopCamera(); gallery.value?.showModal(); void loadGallery() }
 const title = ref('')
 const hasText = ref(false)
-const layerFont = ref<{ style: string; weight: number } | null>(null)
+const layerFont = ref<{ family: string; style: string; weight: number } | null>(null)
 const currentTextFont = computed(() => layerFont.value ?? activeFont.value)
 watch(activeFont, () => { layerFont.value = null })
 const ink = ref('#ffffff')
@@ -198,7 +198,7 @@ const displayTitle = computed(() => allCaps.value ? title.value.toUpperCase() : 
 type TextLayer = {
   id: number; title: string; ink: string; alignment: 'left' | 'center' | 'right'; lineHeight: number; size: number; caps: boolean;
   width: number; boxHeight: number | null; offset: { x: number; y: number }; rotation: number;
-  layout: { top: number; fontSize: number; height: number }; font: { style: string; weight: number };
+  layout: { top: number; fontSize: number; height: number }; font: { family: string; style: string; weight: number };
 }
 const savedTexts = ref<TextLayer[]>([])
 const posterContent = computed(() => ({ photo: hasPhoto.value, texts: [...savedTexts.value.map(layer => layer.title), ...(hasText.value ? [title.value] : [])] }))
@@ -206,7 +206,7 @@ const canPublish = computed(() => hasPosterContent(posterContent.value))
 let nextTextId = 0
 let currentTextId = 0
 function snapshotText(): TextLayer {
-  return { id: currentTextId, title: title.value, ink: ink.value, alignment: alignment.value, lineHeight: lineHeight.value, size: typeSize.value, caps: allCaps.value, width: textWidth.value, boxHeight: textBoxHeight.value, offset: { ...textOffset.value }, rotation: rotation.value, layout: { ...textLayout.value }, font: { style: currentTextFont.value.style, weight: currentTextFont.value.weight } }
+  return { id: currentTextId, title: title.value, ink: ink.value, alignment: alignment.value, lineHeight: lineHeight.value, size: typeSize.value, caps: allCaps.value, width: textWidth.value, boxHeight: textBoxHeight.value, offset: { ...textOffset.value }, rotation: rotation.value, layout: { ...textLayout.value }, font: { family: currentTextFont.value.family, style: currentTextFont.value.style, weight: currentTextFont.value.weight } }
 }
 function keepText() {
   if (hasText.value && title.value.trim()) savedTexts.value.push(snapshotText())
@@ -257,7 +257,7 @@ async function editSavedText(id: number) {
   textEditor.value?.focus()
 }
 function savedTextStyle(layer: TextLayer) {
-  return { left: `${(960 - layer.width) / 19.2}%`, width: `${layer.width / 9.6}%`, top: `${layer.layout.top}%`, height: `${layer.layout.height}%`, transform: `translate(${layer.offset.x / 9.6}cqw, ${layer.offset.y / 9.6}cqw) rotate(${layer.rotation}deg)`, color: layer.ink, fontSize: `${layer.size / 9.6}cqw`, fontWeight: layer.font.weight, fontStyle: layer.font.style, textAlign: layer.alignment, lineHeight: layer.lineHeight }
+  return { left: `${(960 - layer.width) / 19.2}%`, width: `${layer.width / 9.6}%`, top: `${layer.layout.top}%`, height: `${layer.layout.height}%`, transform: `translate(${layer.offset.x / 9.6}cqw, ${layer.offset.y / 9.6}cqw) rotate(${layer.rotation}deg)`, color: layer.ink, fontSize: `${layer.size / 9.6}cqw`, fontFamily: layer.font.family, fontWeight: layer.font.weight, fontStyle: layer.font.style, textAlign: layer.alignment, lineHeight: layer.lineHeight }
 }
 const cameraOpen = ref(false)
 const cameraFacing = ref<'user' | 'environment'>('environment')
@@ -389,8 +389,8 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
   if (!target) return
   const version = exportCanvas ? paintVersion : ++paintVersion
   const font = currentTextFont.value
-  if (exportCanvas) await Promise.all(savedTexts.value.map(layer => document.fonts.load(`${layer.font.style} ${layer.font.weight} 120px "AB Terminal"`)))
-  await document.fonts.load(`${font.style} ${font.weight} 120px "AB Terminal"`)
+  if (exportCanvas) await Promise.all(savedTexts.value.map(layer => document.fonts.load(`${layer.font.style} ${layer.font.weight} 120px ${layer.font.family}`)))
+  await document.fonts.load(`${font.style} ${font.weight} 120px ${font.family}`)
   if (disposed || (!exportCanvas && version !== paintVersion)) return
   const context = target.getContext('2d')!
   const width = 960, height = 1200
@@ -402,7 +402,7 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
     context.drawImage(photo, (width - w) / 2, (height - h) / 2, w, h)
   }
   const size = typeSize.value
-  context.font = `${font.style} ${font.weight} ${size}px "AB Terminal"`
+  context.font = `${font.style} ${font.weight} ${size}px ${font.family}`
   const lines = wrap(context, displayTitle.value || 'Your poster', textWidth.value)
   // Match the textarea’s .4em top and bottom padding in preview and export.
   const blockHeight = lines.length * size * lineHeight.value + size * .8
@@ -415,7 +415,7 @@ async function paint(exportCanvas?: HTMLCanvasElement) {
   if (exportCanvas) {
     const layers = [...savedTexts.value, ...(hasText.value ? [snapshotText()] : [])]
     for (const layer of layers) {
-      context.font = `${layer.font.style} ${layer.font.weight} ${layer.size}px "AB Terminal"`
+      context.font = `${layer.font.style} ${layer.font.weight} ${layer.size}px ${layer.font.family}`
       const layerLines = wrap(context, layer.caps ? layer.title.toUpperCase() : layer.title, layer.width)
       const layerHeight = layer.boxHeight ?? layerLines.length * layer.size * layer.lineHeight + layer.size * .8
       const layerTop = (height - layerHeight) / 2
@@ -535,7 +535,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(galleryTimer); galleryMoti
       <div v-show="!cameraOpen && hasText" class="poster-maker__text-object" :class="{ 'is-active': editing || transforming }"
         :style="{ left: `${(960 - textWidth) / 19.2}%`, width: `${textWidth / 9.6}%`, top: `${textLayout.top}%`, height: `${textLayout.height}%`, transform: `translate(${textOffset.x / 9.6}cqw, ${textOffset.y / 9.6}cqw) rotate(${rotation}deg)` }">
         <textarea ref="textEditor" v-model="title" class="poster-maker__type" :class="{ 'is-editing': editing }" maxlength="96" placeholder="Type…" aria-label="Poster text. Drag to move, tap to edit."
-          :style="{ color: ink, fontWeight: currentTextFont.weight, fontStyle: currentTextFont.style, fontSize: `${textLayout.fontSize}cqw`, textAlign: alignment, lineHeight, textTransform: allCaps ? 'uppercase' : 'none' }"
+          :style="{ color: ink, fontFamily: currentTextFont.family, fontWeight: currentTextFont.weight, fontStyle: currentTextFont.style, fontSize: `${textLayout.fontSize}cqw`, textAlign: alignment, lineHeight, textTransform: allCaps ? 'uppercase' : 'none' }"
           @pointerdown="beginTransform($event, 'move')" @pointermove="updateTransform" @pointerup="endTransform" @pointercancel="endTransform" @lostpointercapture="endTransform"
           @focus="editing = true" @keydown.esc="finishEditing" @keydown.meta.enter.prevent="finishEditing" @keydown.ctrl.enter.prevent="finishEditing" />
         <button v-for="edge in (['left', 'right', 'top', 'bottom'] as const)" :key="edge" type="button" class="poster-maker__edge" :class="`poster-maker__edge--${edge}`" :aria-label="`Resize ${edge} boundary`" title="Drag to resize text box"

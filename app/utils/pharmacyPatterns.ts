@@ -1,26 +1,21 @@
-// Each 2–8 second LED program is followed by a dedicated two-second type cut.
+// Cycle continuously through 2–8 second geometric LED programs.
 export const pharmacyResolution = 45
 export const pharmacyProgramCount = 288
-const pharmacyFamilies = [0, 1, 2, 3, 6, 7, 8, 9, 10, 11] as const
-export const pharmacyTypeLabels = ['PHARMACY', '24H'] as const
-export interface LedText { width: number; height: number; pixels: Uint8ClampedArray }
+const pharmacyFamilies = [0, 1, 2, 3, 6, 9, 11] as const
 export function pharmacyProgram(time: number, beat = .5) {
-  const typeBeats = 4
-  const totalBeats = pharmacyProgramCount / 4 * 40 + pharmacyProgramCount * typeBeats
+  const totalBeats = pharmacyProgramCount / 4 * 40
   let remaining = ((time / beat) % totalBeats + totalBeats) % totalBeats
   let index = 0
   for (; index < pharmacyProgramCount - 1; index++) {
     const duration = 4 * (index % 4 + 1)
-    if (remaining < duration + typeBeats) break
-    remaining -= duration + typeBeats
+    if (remaining < duration) break
+    remaining -= duration
   }
   const duration = 4 * (index % 4 + 1)
-  const typeCut = remaining >= duration
-  return { index, family: pharmacyFamilies[index % pharmacyFamilies.length]!, variant: Math.floor(index / pharmacyFamilies.length), typeCut,
-    phase: typeCut ? remaining - duration : remaining, beats: typeCut ? typeBeats : duration }
+  return { index, family: pharmacyFamilies[index % pharmacyFamilies.length]!, variant: Math.floor(index / pharmacyFamilies.length), phase: remaining, beats: duration }
 }
-export function pharmacyFrame(time: number, beat = .5, raster?: (text: string) => LedText) {
-  const { index, family, variant, typeCut, phase: clockPhase, beats } = pharmacyProgram(time, beat)
+export function pharmacyFrame(time: number, beat = .5) {
+  const { index, family, variant, phase: clockPhase, beats } = pharmacyProgram(time, beat)
   const phase = (clockPhase * (1 + variant * .037)) % beats
   const frame = new Float32Array(45 * 45)
   const angle = phase * .75
@@ -37,23 +32,6 @@ export function pharmacyFrame(time: number, beat = .5, raster?: (text: string) =
     const c = Math.cos(rotation) * radius, s = Math.sin(rotation) * radius
     line(x - c, y - s, x + c, y + s, value)
     line(x + s, y - c, x - s, y + c, value)
-  }
-  const text = (label: string, x: number, y: number, vertical = false, glitch = false) => {
-    const image = raster?.(label)
-    if (!image) return
-    for (let row = 0; row < image.height; row++) for (let col = 0; col < image.width; col++) {
-      if (image.pixels[(row * image.width + col) * 4 + 3]! < 100) continue
-      const shift = glitch && row % 5 < 2 ? Math.sin(Math.floor(phase * 4) + row + variant) * 7 : 0
-      set(vertical ? x + row : x + col + shift, vertical ? y + col : y + row)
-    }
-  }
-  // All text shots share two cached labels, moving in whole LED steps.
-  // No changing counters, glyph transformations, or per-frame text rasterization.
-  if (typeCut || family === 7 || family === 8 || family === 10) {
-    const label = pharmacyTypeLabels[index % pharmacyTypeLabels.length]!
-    const image = raster?.(label)
-    if (image) text(label, 45 - Math.floor(clockPhase / beats * (image.width + 45)), Math.floor((45 - image.height) / 2))
-    return frame
   }
   if ([1, 2, 6, 9, 11].includes(family)) {
     for (let y = -22; y <= 22; y++) for (let x = -22; x <= 22; x++) {

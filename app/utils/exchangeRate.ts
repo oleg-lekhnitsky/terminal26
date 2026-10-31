@@ -1,6 +1,7 @@
 export interface ExchangeRate {
   rate: number
   date: string
+  stale?: boolean
   history?: { rate: number; date: string }[]
 }
 

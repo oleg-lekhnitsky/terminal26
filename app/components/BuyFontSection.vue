@@ -49,11 +49,11 @@ defineExpose({ openShop })
                 <rect x="6" y="1" width="1" height="1" rx=".18" />
               </svg>
             </span>
-            <span :style="{ fontWeight: option.weight, fontStyle: option.style }">{{ option.label }}<small v-if="option.id === 'full-pack'">All 4 styles</small></span>
+            <span :style="{ fontFamily: option.family, fontWeight: option.weight, fontStyle: option.style }">{{ option.label }}<small v-if="option.id === 'full-pack'">All 8 styles</small></span>
             <span class="buy-font__price">${{ option.price }}</span>
           </label>
         </fieldset>
-        <p v-if="total > fullPack.price" class="buy-font__note" role="status">All 4 styles cost ${{ fullPack.price }} with Full pack.</p>
+        <p v-if="total > fullPack.price" class="buy-font__note" role="status">All 8 styles cost ${{ fullPack.price }} with Full pack.</p>
         <p v-if="checkoutError" class="buy-font__error" role="alert">{{ checkoutError }}</p>
         <p class="buy-font__license">Desktop, web, and apps included. Unlimited projects.<br />By checking out, you agree to the <a href="/license" target="_blank" rel="noopener">font license</a>.</p>
         <button class="buy-font__checkout" type="button" :disabled="checkingOut || !selected.length" :aria-busy="checkingOut" @click="checkout">
@@ -76,7 +76,7 @@ defineExpose({ openShop })
     border: 0; border-radius: calc(var(--radius-xl) * 2);
     background: linear-gradient(180deg, #000000 18%, #23314b 65%, #7c8390 100%); color: #eeeae3;
     font-size: clamp(32px, 7vw, 128px); line-height: 1.05; text-align: center;
-    font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     transition: color 150ms ease, scale 150ms ease;
     @media (hover: hover) { &:hover { color: #daf759; } }
     &:active { scale: .96; }

@@ -37,7 +37,7 @@ const alignments = ['left', 'center', 'right'] as const
 const trackingLabel = computed(() => `${tracking.value > 0 ? '+' : ''}${tracking.value.toFixed(2)} em`)
 const appearance = computed(() => ({
   fontSize: `${size.value}px`,
-  fontWeight: activeFont.value.weight,
+  fontFamily: activeFont.value.family, fontWeight: activeFont.value.weight,
   fontStyle: activeFont.value.style,
   letterSpacing: `${tracking.value}em`,
   lineHeight: leading.value,

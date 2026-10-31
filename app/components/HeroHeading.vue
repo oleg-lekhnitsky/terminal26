@@ -1,9 +1,50 @@
 <script setup lang="ts">
 const heading = useTemplateRef('heading')
+const { activeFont } = useFontSelection()
 const lines = ['AB Terminal', 'Typeface']
 const palette = ['#daf759', '#ff6500', '#f652e3']
 let frame = 0
 let motionQuery: MediaQueryList | undefined
+let resizeObserver: ResizeObserver | undefined
+let layoutFrame = 0
+let fontRequest = 0
+let disposed = false
+
+function measureLetters() {
+  heading.value?.querySelectorAll<HTMLElement>('.hero-heading__line').forEach(row => {
+    const text = row.querySelector<HTMLElement>('.hero-heading__text')
+    const node = text?.firstChild
+    if (!text || !node) return
+    const bounds = row.getBoundingClientRect()
+    const range = document.createRange()
+    // Measure character boxes inside one fully shaped text run. Individual
+    // inline-blocks cannot kern against their neighboring letters.
+    row.querySelectorAll<HTMLElement>('.hero-heading__letter').forEach((letter, index) => {
+      range.setStart(node, index)
+      range.setEnd(node, index + 1)
+      const box = range.getBoundingClientRect()
+      letter.style.left = `${box.left - bounds.left}px`
+      letter.style.width = `${box.width}px`
+    })
+    row.classList.add('is-measured')
+  })
+}
+
+async function updateLayout() {
+  if (!heading.value || disposed) return
+  const request = ++fontRequest
+  reset()
+  heading.value.querySelectorAll('.hero-heading__line').forEach(row => row.classList.remove('is-measured'))
+  const style = getComputedStyle(heading.value)
+  try {
+    await document.fonts.load(`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`, lines.join(' '))
+  } catch { /* Measure the available font if the selected face cannot load. */ }
+  if (disposed || request !== fontRequest) return
+  cancelAnimationFrame(layoutFrame)
+  layoutFrame = requestAnimationFrame(measureLetters)
+}
+
+watch(activeFont, () => { if (import.meta.client) void updateLayout() }, { flush: 'post' })
 
 function reset() {
   cancelAnimationFrame(frame)
@@ -49,8 +90,15 @@ onMounted(() => {
   motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
   motionQuery.addEventListener('change', reset)
   window.addEventListener('blur', reset)
+  resizeObserver = new ResizeObserver(() => { void updateLayout() })
+  if (heading.value) resizeObserver.observe(heading.value)
+  void updateLayout()
 })
 onBeforeUnmount(() => {
+  disposed = true
+  fontRequest++
+  cancelAnimationFrame(layoutFrame)
+  resizeObserver?.disconnect()
   cancelAnimationFrame(frame)
   motionQuery?.removeEventListener('change', reset)
   window.removeEventListener('blur', reset)
@@ -62,15 +110,22 @@ onBeforeUnmount(() => {
     @pointermove="react" @pointerdown="react" @pointerleave="reset"
     @pointerup="release" @pointercancel="reset">
     <span v-for="line in lines" :key="line" class="hero-heading__line" aria-hidden="true">
+      <span class="hero-heading__text">{{ line }}</span>
       <span v-for="(letter, index) in line" :key="index" class="hero-heading__letter">{{ letter === ' ' ? '\u00a0' : letter }}</span>
     </span>
   </h1>
 </template>
 
 <style scoped>
-.hero-heading__line { display: block; position: relative; white-space: nowrap; }
+.hero-heading { cursor: default; }
+.hero-heading__line { display: block; position: relative; white-space: pre; }
+.hero-heading__text { font-kerning: normal; }
+.hero-heading__line.is-measured .hero-heading__text { visibility: hidden; }
+.hero-heading__line.is-measured .hero-heading__letter { visibility: visible; }
 .hero-heading__letter {
-  display: inline-block;
+  position: absolute;
+  top: 0;
+  visibility: hidden;
   transform-origin: 50% 75%;
   transition: transform 150ms ease-out, color 150ms ease-out;
 }

@@ -2,37 +2,27 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { pharmacyFrame, pharmacyProgram, pharmacyProgramCount } from '../app/utils/pharmacyPatterns.ts'
 
-const raster = label => {
-  const width = label.length * 6
-  const pixels = new Uint8ClampedArray(width * 7 * 4).fill(255)
-  return { width, height: 7, pixels }
-}
-
-test('all programs use only the two scrolling labels and keep LEDs inside the cross', () => {
-  const labels = new Set()
+test('all geometric programs illuminate LEDs only inside the cross', () => {
   let time = 0
   for (let index = 0; index < pharmacyProgramCount; index++) {
-    const patternSeconds = 2 * (index % 4 + 1)
-    for (const offset of [patternSeconds / 2, patternSeconds + 1]) {
-      const frame = pharmacyFrame(time + offset, .5, label => {
-        labels.add(label)
-        return raster(label)
-      })
+    const seconds = 2 * (index % 4 + 1)
+    assert.equal(pharmacyProgram(time).index, index)
+    for (const offset of [.25, seconds / 2, seconds - .25]) {
+      const frame = pharmacyFrame(time + offset)
       assert.equal(frame.length, 45 * 45)
+      assert.ok(frame.some(value => value > 0), `Program ${index} must illuminate the cross`)
       frame.forEach((value, pixel) => {
         assert.ok(Number.isFinite(value) && value >= 0 && value <= 1)
         if (Math.abs(pixel % 45 - 22) > 7 && Math.abs(Math.floor(pixel / 45) - 22) > 7) assert.equal(value, 0)
       })
     }
-    time += patternSeconds + 2
+    time += seconds
   }
-  assert.deepEqual([...labels].sort(), ['24H', 'PHARMACY'])
+  assert.equal(pharmacyProgram(time).index, 0)
 })
 
-test('typography shots scroll through the matrix instead of holding a glyph', () => {
-  assert.equal(pharmacyProgram(2.5).typeCut, true)
-  const first = pharmacyFrame(2.5, .5, raster)
-  const second = pharmacyFrame(3, .5, raster)
-  assert.ok(first.some(value => value > 0))
-  assert.notDeepEqual(first, second)
+test('programs transition directly into the next animation', () => {
+  assert.equal(pharmacyProgram(1.99).index, 0)
+  assert.equal(pharmacyProgram(2).index, 1)
+  assert.notDeepEqual(pharmacyFrame(2.5), pharmacyFrame(3))
 })

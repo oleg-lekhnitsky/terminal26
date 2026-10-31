@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { createFrameGate, renderBudget } from '~/utils/renderBudget'
 import { motionSystem } from '~/utils/textRenderer'
-import { pharmacyFrame, type LedText } from '~/utils/pharmacyPatterns'
+import { pharmacyFrame } from '~/utils/pharmacyPatterns'
 
 const host = useTemplateRef('host')
 const canvas = useTemplateRef('canvas')
-const { activeFont } = useFontSelection()
-const ramp = 'PHARMACY 24H'
 const size = 45
-const textCache = new Map<string, LedText>()
 let background: HTMLCanvasElement | undefined
 let ledSprite: HTMLCanvasElement | undefined
 const leds = Array.from({ length: size * size }, (_, index) => ({
@@ -23,40 +20,6 @@ let visible = false
 let elapsed = 0
 let previous = 0
 
-function makeLettering() { textCache.clear() }
-function rasterText(label: string): LedText {
-  const cached = textCache.get(label)
-  if (cached) return cached
-  const source = document.createElement('canvas')
-  const context = source.getContext('2d', { willReadFrequently: true })!
-  const font = `${activeFont.value.style} ${activeFont.value.weight} 10px "AB Terminal"`
-  context.font = font
-  source.width = Math.max(1, Math.ceil(context.measureText(label).width) + 4)
-  source.height = 24
-  context.font = font
-  context.fillStyle = '#fff'
-  context.textBaseline = 'middle'
-  context.fillText(label, 2, 12)
-  const pixels = context.getImageData(0, 0, source.width, source.height).data
-  // Center the rows that actually light LEDs, rather than the font line box.
-  // Use the same alpha threshold as pharmacyFrame; crop only once per label.
-  let top = source.height, bottom = -1
-  for (let row = 0; row < source.height; row++) {
-    for (let col = 0; col < source.width; col++) {
-      if (pixels[(row * source.width + col) * 4 + 3]! >= 100) {
-        top = Math.min(top, row)
-        bottom = Math.max(bottom, row)
-      }
-    }
-  }
-  const height = bottom >= top ? bottom - top + 1 : 1
-  const image = { width: source.width, height, pixels: bottom >= top
-    ? pixels.slice(top * source.width * 4, (bottom + 1) * source.width * 4)
-    : new Uint8ClampedArray(source.width * 4) }
-  if (textCache.size >= 64) textCache.delete(textCache.keys().next().value!)
-  textCache.set(label, image)
-  return image
-}
 function cross(context: CanvasRenderingContext2D, offsetX: number, offsetY: number) {
   context.beginPath()
   const points = [[-76,-226],[76,-226],[76,-76],[226,-76],[226,76],[76,76],[76,226],[-76,226],[-76,76],[-226,76],[-226,-76],[-76,-76]]
@@ -107,7 +70,7 @@ function draw() {
   context.drawImage(background, 0, 0)
   context.save()
   context.setTransform(canvas.value.width / 600, 0, 0, canvas.value.height / 600, 300 * canvas.value.width / 600, 300 * canvas.value.height / 600)
-  const matrix = pharmacyFrame(reduced?.matches ? .2 : elapsed, motionSystem.enter * .625, rasterText)
+  const matrix = pharmacyFrame(reduced?.matches ? .2 : elapsed, motionSystem.enter * .625)
   for (const { index, x, y } of leds) {
     const light = matrix[index]!
     if (light < .02) continue
@@ -130,15 +93,7 @@ function sync() {
   draw()
   if (!reduced?.matches) frame = requestAnimationFrame(tick)
 }
-watch(activeFont, async (font, _, onCleanup) => {
-  if (!import.meta.client) return
-  let cancelled = false
-  onCleanup(() => { cancelled = true })
-  await document.fonts.load(`${font.style} ${font.weight} 12px "AB Terminal"`, ramp)
-  if (!cancelled) { makeLettering(); draw() }
-}, { immediate: true })
 onMounted(() => {
-  makeLettering()
   reduced = matchMedia('(prefers-reduced-motion: reduce)')
   reduced.addEventListener('change', sync)
   document.addEventListener('visibilitychange', sync)
@@ -166,7 +121,7 @@ onBeforeUnmount(() => {
 <template>
   <figure ref="host" class="pharmacy-pin">
     <div class="pharmacy-pin__art">
-      <canvas ref="canvas" role="img" aria-label="Monochrome green LED pharmacy cross with 288 generated programs: cross transformations, scrolling PHARMACY and 24H lettering, ECG traces, and glitches">Animated LED pharmacy cross.</canvas>
+      <canvas ref="canvas" role="img" aria-label="Monochrome green LED pharmacy cross with 288 generated programs: cross transformations, geometric patterns, ECG traces, and glitches">Animated LED pharmacy cross.</canvas>
     </div>
     <figcaption>Type pharmacy</figcaption>
   </figure>

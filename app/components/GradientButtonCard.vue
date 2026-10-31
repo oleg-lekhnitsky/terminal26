@@ -109,7 +109,7 @@ const colors = computed(() => ({
     background: var(--button);
     color: #fffbe8cc;
     font-family: var(--font-sans);
-    font-weight: var(--specimen-weight, 700);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
     font-size: 4cqw;
     letter-spacing: .08em;

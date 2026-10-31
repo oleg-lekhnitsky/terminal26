@@ -31,7 +31,7 @@ function draw() {
   const radius = 244
   const rotation = .35 + elapsed / (motionSystem.enter * 30) * Math.PI * 2
   const tilt = .18
-  context.font = `${activeFont.value.style} ${activeFont.value.weight} ${cell * .96}px "AB Terminal"`
+  context.font = `${activeFont.value.style} ${activeFont.value.weight} ${cell * .96}px ${activeFont.value.family}`
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   context.fillStyle = '#fff4d6'
@@ -73,7 +73,7 @@ watch(activeFont, async (font, _, onCleanup) => {
   if (!import.meta.client) return
   let cancelled = false
   onCleanup(() => { cancelled = true })
-  await document.fonts.load(`${font.style} ${font.weight} 12px "AB Terminal"`, ramp)
+  await document.fonts.load(`${font.style} ${font.weight} 12px ${font.family}`, ramp)
   if (!cancelled) draw()
 }, { immediate: true })
 onMounted(() => {

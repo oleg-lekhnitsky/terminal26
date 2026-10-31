@@ -15,7 +15,7 @@ watch([rate, activeFont], async ([text, font], _, onCleanup) => {
   if (!import.meta.client || !text) return
   let cancelled = false
   onCleanup(() => { cancelled = true })
-  const descriptor = `${font.style} ${font.weight} 100px "AB Terminal"`
+  const descriptor = `${font.style} ${font.weight} 100px ${font.family}`
   await document.fonts.load(descriptor, text)
   if (cancelled) return
   const context = document.createElement('canvas').getContext('2d')
@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
         <button v-if="error" type="button" :disabled="status === 'pending'" @click="refresh">Try again</button>
       </div>
     </div>
-    <figcaption><span>Exchange rate</span><a href="https://www.nbrb.by/statistics/rates/ratesdaily" target="_blank"
+    <figcaption><span>{{ data?.stale ? `Rate as of ${data.date}` : 'Exchange rate' }}</span><a href="https://www.nbrb.by/statistics/rates/ratesdaily" target="_blank"
         rel="noopener noreferrer">NBRB ↗</a></figcaption>
   </figure>
 </template>
@@ -133,7 +133,7 @@ onBeforeUnmount(() => {
     color: #daf759;
     text-align: center;
     font-family: var(--font-sans);
-    font-weight: var(--specimen-weight, 700);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700);
     font-style: var(--specimen-style, normal);
     letter-spacing: var(--exchange-tracking);
   }

@@ -36,20 +36,23 @@ for path in sorted((root / 'app/assets/fonts').glob('*.ttf')):
     pixel.endPtsOfContours = [len(points) - 1]
     pixel.flags = deepcopy(pixel_flags)
     # Match the body pixel spacing and the rightward placement in italic faces.
-    step = 102 if 'Bold' in path.name else 105
+    columns = sorted({min(x for x, y in part) for part, _ in top})
+    rows = sorted({min(y for x, y in part) for part, _ in contours})
+    step_x = min((b - a for a, b in zip(columns, columns[1:])), default=size)
+    step_y = min((b - a for a, b in zip(rows, rows[1:])), default=size)
     center = (min(x for part, _ in top for x, y in part)
               + max(x for part, _ in top for x, y in part)) / 2
-    if 'Italic' in path.name:
-        center += 55
-    gap = 40 if 'Bold' in path.name else 50
-    left = round(center - (step + size) / 2)
+    if 'italic' in path.name.lower():
+        center += step_x / 2
+    gap = 40 if 'bold' in path.name.lower() else 50
+    left = round(center - (step_x + size) / 2)
     bottom = base.yMax + gap
     pen = TTGlyphPen(font.getGlyphSet())
     base.draw(pen, font['glyf'])
-    for offset in (0, step):
+    for offset_x, offset_y in ((0, 0), (step_x, step_y)):
         pixel.draw(TransformPen(pen, (1, 0, 0, 1,
-                                     left + offset - x_min,
-                                     bottom + offset - y_min)), font['glyf'])
+                                     left + offset_x - x_min,
+                                     bottom + offset_y - y_min)), font['glyf'])
     glyph = pen.glyph()
     glyph.recalcBounds(font['glyf'])
     font.setGlyphOrder(font.getGlyphOrder() + ['oacute'])

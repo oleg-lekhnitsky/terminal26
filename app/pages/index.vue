@@ -12,7 +12,7 @@ import type { Component } from 'vue'
 
 const siteUrl = useRuntimeConfig().public.siteUrl.replace(/\/$/, '')
 const pageTitle = 'AB Terminal — Typeface by Alex Blohin'
-const description = 'Explore four styles, try your own text, and use AB Terminal in personal and commercial projects across desktop, web, and apps.'
+const description = 'Explore eight styles, try your own text, and use AB Terminal in personal and commercial projects across desktop, web, and apps.'
 useSeoMeta({
   title: pageTitle,
   description,
@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="home-page" :style="{ '--specimen-weight': activeFont.weight, '--specimen-style': activeFont.style }">
+  <main class="home-page" :style="{ '--specimen-family': activeFont.family, '--specimen-weight': activeFont.weight, '--specimen-style': activeFont.style }">
     <header class="home-hero">
       <div class="home-hero__author">
         <img class="home-hero__avatar" src="/favicon/frame-0.png" width="40" height="40" alt="" />
@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
   &__buy {
     min-height: 56px; padding: 16px 32px; border: 0; border-radius: var(--radius-full);
     background: #eeeae3; color: #24221f; font: 400 18px var(--font-sans); cursor: pointer;
-    font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     transition: background-color 150ms ease, scale 150ms ease;
     @media (hover: hover) { &:hover { background: #daf759; } }
     &:active { scale: .96; }
@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
   h1 {
     margin: 0; color: var(--color-text); font-family: var(--font-sans);
     font-size: clamp(36px, 8vw, 144px); line-height: .95;
-    font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
+    font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 400); font-style: var(--specimen-style, normal);
     letter-spacing: -.04em;
   }
 }

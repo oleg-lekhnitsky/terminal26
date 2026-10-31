@@ -155,7 +155,7 @@ watch(cells, value => {
   &__cell.is-on { background: #ffbd13; }
   &__cell:focus-visible { outline: 2px solid #fff3ce; outline-offset: 1px; z-index: 1; }
   &__tools { display: flex; align-items: center; gap: 3cqw; margin-top: 5cqw; }
-  &__tools button { min-height: 44px; padding: .5em .25em; background: transparent; border: 0; color: inherit; font-family: var(--font-sans); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); font-size: 3.7cqw; cursor: pointer; }
+  &__tools button { min-height: 44px; padding: .5em .25em; background: transparent; border: 0; color: inherit; font-family: var(--font-sans); font-family: var(--specimen-family, var(--font-sans)); font-weight: var(--specimen-weight, 700); font-style: var(--specimen-style, normal); font-size: 3.7cqw; cursor: pointer; }
   &__tools button:last-child { margin-left: auto; }
   &__tools button:disabled { opacity: .35; cursor: default; }
   &__tools button:active:not(:disabled) { transform: scale(.96); }

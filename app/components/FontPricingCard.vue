@@ -44,8 +44,8 @@ function navigateProducts(event: KeyboardEvent) {
         @keydown.left.prevent="navigateProducts" @keydown.right.prevent="navigateProducts">
         <li v-for="product in fontProducts" :key="product.id" class="price-pin__product">
           <div class="price-pin__specimen"
-            :style="{ fontWeight: product.weight, fontStyle: product.style }">
-            <h3>{{ product.label }}</h3>
+            :style="{ fontFamily: product.family, fontWeight: product.weight, fontStyle: product.style }">
+            <h3><span v-for="(word, index) in product.label.split(' ')" :key="index" class="price-pin__word">{{ word }}{{ index < product.label.split(' ').length - 1 ? ' ' : '' }}</span></h3>
             <p :aria-label="`${product.price} US dollars`">{{ money(product.price) }}</p>
           </div>
           <button class="price-pin__add" :class="{ 'price-pin__add--checkout': included(product.id) }" type="button"
@@ -70,7 +70,7 @@ function navigateProducts(event: KeyboardEvent) {
         <p v-if="!cartProducts.length">Your cart is empty.</p>
         <ul v-else>
           <li v-for="item in cartProducts" :key="item.id">
-            <div class="price-cart__item"><span :style="{ fontWeight: item.weight, fontStyle: item.style }">{{
+            <div class="price-cart__item"><span :style="{ fontFamily: item.family, fontWeight: item.weight, fontStyle: item.style }">{{
                 item.label }}</span><small>{{ item.description }}</small>
               <button type="button" :aria-label="`Remove ${item.label}`"
                 @click="cart = cart.filter(id => id !== item.id)">Remove</button>
@@ -130,8 +130,11 @@ function navigateProducts(event: KeyboardEvent) {
   &__specimen {
     padding: 0 1cqw 1cqw; transform: translateY(-1cqw); font-size: 13cqw; line-height: 1.1; letter-spacing: -.035em;
     h3, p { margin: 0; font: inherit; }
+    h3 { overflow-wrap: normal; word-break: normal; }
   }
+  &__word { display: inline-block; white-space: pre; }
   &__add {
+    flex-shrink: 0;
     width: 100%; min-height: 44px; height: 18cqw; padding: 2cqw;
     border: 0; border-radius: 6cqw; background: #20221f; color: #f1f1e9;
     font-size: max(12px, 3.5cqw); transition: background-color 150ms ease, color 150ms ease, scale 150ms ease;
