@@ -3,10 +3,10 @@ import type { H3Event } from 'h3'
 import { stripeKeyProblem } from './stripeKey'
 import { purchasedFonts, verifyDownloadToken, type PaidSession } from './fontDelivery'
 
-export async function verifiedFontOrder(event: H3Event) {
+export async function verifiedFontOrder(event: H3Event, credentials?: { session_id?: unknown; token?: unknown }) {
   setHeader(event, 'Cache-Control', 'private, no-store')
   setHeader(event, 'Referrer-Policy', 'no-referrer')
-  const query = getQuery(event)
+  const query = credentials ?? getQuery(event)
   const id = query.session_id || getCookie(event, 'font-checkout-session')
   if (typeof id !== 'string' || !/^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(id)) {
     throw createError({ statusCode: 400, statusMessage: 'Open the download link for your order.' })

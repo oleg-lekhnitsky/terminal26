@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { checkoutProducts } from './fontCheckout.ts'
+import { fontProducts } from '../../app/utils/fontShop.ts'
 
 export const downloadLifetime = 180 * 24 * 60 * 60
 export interface PaidSession {
@@ -51,6 +52,14 @@ export function purchasedFonts(session: PaidSession) {
   return legacyPack
     ? products.map(product => product.id === 'full-pack' ? { ...product, price: 40 } : product)
     : products
+}
+// Full pack owners can download the complete archive or any included style.
+export function downloadableFonts(products: readonly { id: string; label: string }[]) {
+  if (!products.some(product => product.id === 'full-pack')) return products
+  return [...fontProducts, ...products.filter(product => !fontProducts.some(item => item.id === product.id))]
+}
+export function canDownloadFont(products: readonly { id: string; label: string }[], id: unknown): id is string {
+  return typeof id === 'string' && downloadableFonts(products).some(product => product.id === id)
 }
 export function createDownloadToken(sessionId: string, secret: string, now = Date.now()) {
   const payload = Buffer.from(JSON.stringify({ id: sessionId, exp: Math.floor(now / 1000) + downloadLifetime })).toString('base64url')

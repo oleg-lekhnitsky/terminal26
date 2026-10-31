@@ -6,7 +6,36 @@ const cart = useState<FontProductId[]>('font-cart', () => [])
 const cartProducts = computed(() => fontProducts.filter(item => cart.value.includes(item.id)))
 const total = computed(() => cartProducts.value.reduce((sum, item) => sum + item.price, 0))
 const included = (id: FontProductId) => cart.value.includes(id) || cart.value.includes('full-pack')
+const { downloads, purchased, checkingPurchases, downloading, downloadError, downloadFont } = useFontLibrary()
+watch(downloads, () => { cart.value = cart.value.filter(id => !purchased(id)) })
+function productAction(id: FontProductId) {
+  if (purchased(id)) void downloadFont(id)
+  else if (included(id)) dialog.value?.showModal()
+  else add(id)
+}
+function productLabel(id: FontProductId) {
+  if (downloading.value === id) return 'Downloading…'
+  if (purchased(id)) return 'Download'
+  if (checkingPurchases.value) return 'Checking…'
+  return included(id) ? 'Checkout' : 'Add to cart'
+}
 const dialog = useTemplateRef('dialog')
+const host = useTemplateRef('host')
+let lastPointerType = ''
+let closeFocusFrame = 0
+function clearTouchFocus() {
+  cancelAnimationFrame(closeFocusFrame)
+  if (lastPointerType !== 'touch' && lastPointerType !== 'pen') return
+  // Native dialog focus restoration finishes before the next paint.
+  closeFocusFrame = requestAnimationFrame(() => {
+    if (lastPointerType !== 'touch' && lastPointerType !== 'pen') return
+    const focused = document.activeElement
+    if (focused instanceof HTMLElement && host.value?.contains(focused) && !dialog.value?.contains(focused)) {
+      focused.blur()
+    }
+  })
+}
+onBeforeUnmount(() => cancelAnimationFrame(closeFocusFrame))
 const money = (value: number) => `$${value}`
 const { checkingOut, checkoutError, checkout } = useFontCheckout(() => cart.value)
 let loaded = false
@@ -36,7 +65,7 @@ function navigateProducts(event: KeyboardEvent) {
 </script>
 
 <template>
-  <figure class="price-pin">
+  <figure ref="host" class="price-pin" @pointerdown.capture="lastPointerType = $event.pointerType" @keydown.capture="lastPointerType = ''">
     <div class="price-pin__art">
       <header><span>AB Terminal</span><button type="button" @click="dialog?.showModal()">Cart · {{ cart.length
           }}</button></header>
@@ -48,15 +77,17 @@ function navigateProducts(event: KeyboardEvent) {
             <h3><span v-for="(word, index) in product.label.split(' ')" :key="index" class="price-pin__word">{{ word }}{{ index < product.label.split(' ').length - 1 ? ' ' : '' }}</span></h3>
             <p :aria-label="`${product.price} US dollars`">{{ money(product.price) }}</p>
           </div>
-          <button class="price-pin__add" :class="{ 'price-pin__add--checkout': included(product.id) }" type="button"
-            :aria-label="included(product.id) ? `Checkout ${product.label}` : `Add ${product.label} to cart`"
-            @click="included(product.id) ? dialog?.showModal() : add(product.id)">{{ included(product.id) ? 'Checkout' : 'Add to cart' }}</button>
+          <button class="price-pin__add" :class="{ 'price-pin__add--checkout': !purchased(product.id) && included(product.id) }" type="button"
+            :disabled="checkingPurchases || (purchased(product.id) && !!downloading)"
+            :aria-label="purchased(product.id) ? `Download ${product.label}` : included(product.id) ? `Checkout ${product.label}` : `Add ${product.label} to cart`"
+            @click="productAction(product.id)">{{ productLabel(product.id) }}</button>
         </li>
       </ul>
       <span class="sr-only" role="status">{{ cart.length ? `${cart.length} items in cart` : '' }}</span>
     </div>
+    <p v-if="downloadError" class="price-pin__error" role="alert">{{ downloadError }} <NuxtLink to="/checkout">Your downloads</NuxtLink></p>
     <figcaption>Font shop</figcaption>
-    <dialog ref="dialog" class="price-cart" :aria-labelledby="cartTitleId" @click.self="dialog?.close()">
+    <dialog ref="dialog" class="price-cart" :aria-labelledby="cartTitleId" @close="clearTouchFocus" @click.self="dialog?.close()">
       <div class="price-cart__inner">
         <button class="price-cart__close" type="button" aria-label="Close cart" @click="dialog?.close()">
           <PixelCloseIcon />
@@ -132,12 +163,14 @@ function navigateProducts(event: KeyboardEvent) {
     h3, p { margin: 0; font: inherit; }
     h3 { overflow-wrap: normal; word-break: normal; }
   }
+  &__error { font-size: 12px; line-height: 1.4; }
   &__word { display: inline-block; white-space: pre; }
   &__add {
     flex-shrink: 0;
     width: 100%; min-height: 44px; height: 18cqw; padding: 2cqw;
     border: 0; border-radius: 6cqw; background: #20221f; color: #f1f1e9;
     font-size: max(12px, 3.5cqw); transition: background-color 150ms ease, color 150ms ease, scale 150ms ease;
+    &:disabled { cursor: wait; opacity: .7; }
     &--checkout { background: #ff6500; color: #20221f; }
     @media (hover: hover) { &:hover { background: #ff6500; color: #20221f; } }
     &:active { scale: .96; }

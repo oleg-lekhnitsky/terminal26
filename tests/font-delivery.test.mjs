@@ -67,3 +67,21 @@ test('historical $40 full pack orders still validate with Stripe subtotal fields
   assert.equal(purchasedFonts(old)[0].price, 40)
   assert.equal(purchasedFonts({ ...old, amount_total: 3200, total_details: { amount_discount: 800 } })[0].price, 40)
 })
+
+test('full pack owners can download every included style without unlocking unrelated files', async () => {
+  const { downloadableFonts, canDownloadFont } = await import('../server/utils/fontDelivery.ts')
+  const pack = [{ id: 'full-pack', label: 'Full pack' }]
+  const files = downloadableFonts(pack)
+  assert.equal(files.length, 9)
+  for (const item of files) assert.equal(canDownloadFont(pack, item.id), true)
+  assert.equal(canDownloadFont(pack, '../regular'), false)
+  assert.equal(canDownloadFont(pack, 'test-font'), false)
+  assert.equal(canDownloadFont([...pack, { id: 'test-font', label: 'Test font' }], 'test-font'), true)
+  assert.equal(canDownloadFont(pack, null), false)
+  const single = [{ id: 'bold', label: 'Bold' }]
+  assert.equal(canDownloadFont(single, 'bold'), true)
+  assert.equal(canDownloadFont(single, 'italic'), false)
+  assert.equal(canDownloadFont(single, 'full-pack'), false)
+  assert.deepEqual(downloadableFonts(single), single)
+  assert.equal(canDownloadFont([], 'regular'), false)
+})

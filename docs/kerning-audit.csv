@@ -168,7 +168,7 @@ Regular,Latin lowercase,ir,0,127,231.0,107
 Regular,Latin lowercase,is,0,130,312,110
 Regular,Latin lowercase,it,0,199,304.0,179
 Regular,Latin lowercase,iv,0,224,224.0,204
-Regular,Latin lowercase,la,0,231,278,211
+Regular,Latin lowercase,la,-65,166,213,146
 Regular,Latin lowercase,le,0,200,248.0,180
 Regular,Latin lowercase,li,0,146,354.0,126
 Regular,Latin lowercase,ll,0,161,369.0,141
@@ -910,7 +910,7 @@ Italic,Latin lowercase,he,0,179,179.0,159
 Italic,Latin lowercase,hi,0,230,343.0,210
 Italic,Latin lowercase,ho,0,169,172.0,149
 Italic,Latin lowercase,ia,0,170,290,150
-Italic,Latin lowercase,ic,0,210,290.0,190
+Italic,Latin lowercase,ic,-35,175,255.0,155
 Italic,Latin lowercase,id,0,206,280.0,186
 Italic,Latin lowercase,ie,0,210,290,190
 Italic,Latin lowercase,if,0,129,444,109
@@ -941,7 +941,7 @@ Italic,Latin lowercase,na,0,159,253,139
 Italic,Latin lowercase,nd,0,170,170.0,150
 Italic,Latin lowercase,ne,0,180,180.0,160
 Italic,Latin lowercase,ng,0,245,245.0,225
-Italic,Latin lowercase,ni,0,231,344.0,211
+Italic,Latin lowercase,ni,-55,176,289.0,156
 Italic,Latin lowercase,nn,0,220,220,200
 Italic,Latin lowercase,no,0,170,173.0,150
 Italic,Latin lowercase,nt,0,180,270.0,160
@@ -986,7 +986,7 @@ Italic,Latin lowercase,rr,0,272,326.0,252
 Italic,Latin lowercase,rs,0,109,336,89
 Italic,Latin lowercase,rt,0,124,481,104
 Italic,Latin lowercase,ru,0,151,408,131
-Italic,Latin lowercase,ry,0,212,468,192
+Italic,Latin lowercase,ry,-40,172,428,152
 Italic,Latin lowercase,sa,0,103,236,83
 Italic,Latin lowercase,sc,0,103,247.0,83
 Italic,Latin lowercase,se,0,103,247.0,83
@@ -1021,7 +1021,7 @@ Italic,Latin lowercase,ui,0,154,364.0,134
 Italic,Latin lowercase,ul,-125,159,231.0,139
 Italic,Latin lowercase,um,0,240,240.0,220
 Italic,Latin lowercase,un,0,240,240.0,220
-Italic,Latin lowercase,up,0,250,250.0,230
+Italic,Latin lowercase,up,-80,170,170.0,150
 Italic,Latin lowercase,ur,0,228,353,208
 Italic,Latin lowercase,us,0,161,259.0,141
 Italic,Latin lowercase,ut,0,80,290.0,60
@@ -1461,7 +1461,7 @@ Italic,Latin corpus,lw,0,211,303.0,191
 Italic,Latin corpus,mu,0,150,153.0,130
 Italic,Latin corpus,nu,0,180,183.0,160
 Italic,Latin corpus,pó,0,112,115.0,92
-Italic,Latin corpus,yp,0,230,230.0,210
+Italic,Latin corpus,yp,-70,160,160.0,140
 Italic,Cyrillic corpus,АР,0,290,294.0,270
 Italic,Cyrillic corpus,АФ,0,108,284.0,88
 Italic,Cyrillic corpus,ВИ,0,162,201.0,142
@@ -1589,7 +1589,7 @@ Bold,Latin mixed,Se,0,110,201.0,90
 Bold,Latin mixed,Co,0,142,528.0,122
 Bold,Latin lowercase,aa,0,100,202,80
 Bold,Latin lowercase,ab,0,100,173,80
-Bold,Latin lowercase,ac,0,173,173.0,153
+Bold,Latin lowercase,ac,-30,143,143.0,123
 Bold,Latin lowercase,ad,0,163,164,143
 Bold,Latin lowercase,ae,0,173,173.0,153
 Bold,Latin lowercase,af,0,115,290,95
@@ -1774,7 +1774,7 @@ Bold,Latin lowercase,ty,0,100,180,80
 Bold,Latin lowercase,ua,0,100,181.0,80
 Bold,Latin lowercase,ue,0,100,100.0,80
 Bold,Latin lowercase,ui,0,115,217.0,95
-Bold,Latin lowercase,ul,-85,118,132.0,98
+Bold,Latin lowercase,ul,-65,138,152.0,118
 Bold,Latin lowercase,um,0,125,125.0,105
 Bold,Latin lowercase,un,0,125,125.0,105
 Bold,Latin lowercase,up,0,120,120.0,100
@@ -2303,7 +2303,7 @@ Bold-Italic,Latin uppercase,WH,-120,111,111.0,91
 Bold-Italic,Latin uppercase,ON,-80,110,110.0,90
 Bold-Italic,Latin uppercase,OO,0,144,144.0,124
 Bold-Italic,Latin mixed,Ta,-210,132,231.0,112
-Bold-Italic,Latin mixed,Te,-280,129,129.0,109
+Bold-Italic,Latin mixed,Te,-245,164,164.0,144
 Bold-Italic,Latin mixed,Ti,-170,130,384.0,110
 Bold-Italic,Latin mixed,To,-280,129,129.0,109
 Bold-Italic,Latin mixed,Tu,-255,129,129.0,109
@@ -2383,7 +2383,7 @@ Bold-Italic,Latin lowercase,ct,0,125,212.0,105
 Bold-Italic,Latin lowercase,da,0,168,267.0,148
 Bold-Italic,Latin lowercase,de,-105,130,130.0,110
 Bold-Italic,Latin lowercase,di,0,176,380.0,156
-Bold-Italic,Latin lowercase,do,0,235,235.0,215
+Bold-Italic,Latin lowercase,do,-105,130,130.0,110
 Bold-Italic,Latin lowercase,dr,0,231,365.0,211
 Bold-Italic,Latin lowercase,ea,0,86,185.0,66
 Bold-Italic,Latin lowercase,ec,0,97,236.0,77
@@ -2533,7 +2533,7 @@ Bold-Italic,Latin lowercase,ui,0,104,308.0,84
 Bold-Italic,Latin lowercase,ul,-85,121,188.0,101
 Bold-Italic,Latin lowercase,um,0,154,154.0,134
 Bold-Italic,Latin lowercase,un,0,209,209.0,189
-Bold-Italic,Latin lowercase,up,0,248,248.0,228
+Bold-Italic,Latin lowercase,up,-80,168,168.0,148
 Bold-Italic,Latin lowercase,ur,0,159,293.0,139
 Bold-Italic,Latin lowercase,us,0,134,226.0,114
 Bold-Italic,Latin lowercase,ut,70,90,294.0,70
@@ -2973,7 +2973,7 @@ Bold-Italic,Latin corpus,lw,0,170,240.0,150
 Bold-Italic,Latin corpus,mu,0,102,102.0,82
 Bold-Italic,Latin corpus,nu,0,102,102.0,82
 Bold-Italic,Latin corpus,pó,0,127,127.0,107
-Bold-Italic,Latin corpus,yp,0,211,211.0,191
+Bold-Italic,Latin corpus,yp,-70,141,141.0,121
 Bold-Italic,Cyrillic corpus,АР,0,200,200.0,180
 Bold-Italic,Cyrillic corpus,АФ,0,86,240.0,66
 Bold-Italic,Cyrillic corpus,ВИ,0,155,185.0,135
@@ -3407,7 +3407,7 @@ Condensed,Cyrillic lowercase,ан,0,70,106,50
 Condensed,Cyrillic lowercase,ап,0,70,106,50
 Condensed,Cyrillic lowercase,ар,0,70,106,50
 Condensed,Cyrillic lowercase,ас,0,106,106,86
-Condensed,Cyrillic lowercase,ат,-75,68,131,48
+Condensed,Cyrillic lowercase,ат,-60,83,146,63
 Condensed,Cyrillic lowercase,ау,0,103,106,83
 Condensed,Cyrillic lowercase,ах,0,70,106,50
 Condensed,Cyrillic lowercase,ац,0,106,106,86
@@ -3630,7 +3630,7 @@ Condensed,Cyrillic lowercase,фр,0,70,104.0,50
 Condensed,Cyrillic lowercase,ха,0,70,111,50
 Condensed,Cyrillic lowercase,хи,0,70,70.0,50
 Condensed,Cyrillic lowercase,хо,0,70,104.0,50
-Condensed,Cyrillic lowercase,ца,0,119,133,99
+Condensed,Cyrillic lowercase,ца,-35,84,98,64
 Condensed,Cyrillic lowercase,це,0,107,119.0,87
 Condensed,Cyrillic lowercase,ци,0,80,119.0,60
 Condensed,Cyrillic lowercase,цо,0,114,119.0,94
@@ -3895,7 +3895,7 @@ Condensed_Italic,Latin lowercase,ct,0,63,117,43
 Condensed_Italic,Latin lowercase,da,0,148,171.0,128
 Condensed_Italic,Latin lowercase,de,-70,88,88.0,68
 Condensed_Italic,Latin lowercase,di,0,136,232.0,116
-Condensed_Italic,Latin lowercase,do,0,158,158.0,138
+Condensed_Italic,Latin lowercase,do,-70,88,88.0,68
 Condensed_Italic,Latin lowercase,dr,0,178,232,158
 Condensed_Italic,Latin lowercase,ea,0,58,98.0,38
 Condensed_Italic,Latin lowercase,ec,0,46,95.0,26
@@ -4045,7 +4045,7 @@ Condensed_Italic,Latin lowercase,ui,0,90,186,70
 Condensed_Italic,Latin lowercase,ul,-65,87,121.0,67
 Condensed_Italic,Latin lowercase,um,0,114,114,94
 Condensed_Italic,Latin lowercase,un,0,134,134,114
-Condensed_Italic,Latin lowercase,up,0,180,182,160
+Condensed_Italic,Latin lowercase,up,-60,120,122,100
 Condensed_Italic,Latin lowercase,ur,0,132,186.0,112
 Condensed_Italic,Latin lowercase,us,0,92,138,72
 Condensed_Italic,Latin lowercase,ut,0,40,141.0,20
@@ -4485,7 +4485,7 @@ Condensed_Italic,Latin corpus,lw,0,119,158.0,99
 Condensed_Italic,Latin corpus,mu,0,88,88,68
 Condensed_Italic,Latin corpus,nu,0,78,78,58
 Condensed_Italic,Latin corpus,pó,0,87,88.0,67
-Condensed_Italic,Latin corpus,yp,0,160,164.0,140
+Condensed_Italic,Latin corpus,yp,-60,100,104.0,80
 Condensed_Italic,Cyrillic corpus,АР,0,122,122.0,102
 Condensed_Italic,Cyrillic corpus,АФ,40,65,140.0,45
 Condensed_Italic,Cyrillic corpus,ВИ,0,106,122.0,86
@@ -4919,7 +4919,7 @@ Condensed_Bold,Cyrillic lowercase,ан,0,65,108.0,45
 Condensed_Bold,Cyrillic lowercase,ап,0,65,108.0,45
 Condensed_Bold,Cyrillic lowercase,ар,0,70,113.0,50
 Condensed_Bold,Cyrillic lowercase,ас,0,108,108.0,88
-Condensed_Bold,Cyrillic lowercase,ат,-90,64,121.0,44
+Condensed_Bold,Cyrillic lowercase,ат,-75,79,136.0,59
 Condensed_Bold,Cyrillic lowercase,ау,0,108,108.0,88
 Condensed_Bold,Cyrillic lowercase,ах,0,65,108.0,45
 Condensed_Bold,Cyrillic lowercase,ац,0,108,108,88
@@ -5142,7 +5142,7 @@ Condensed_Bold,Cyrillic lowercase,фр,0,65,112.0,45
 Condensed_Bold,Cyrillic lowercase,ха,0,65,111.0,45
 Condensed_Bold,Cyrillic lowercase,хи,0,60,60.0,40
 Condensed_Bold,Cyrillic lowercase,хо,0,60,106.0,40
-Condensed_Bold,Cyrillic lowercase,ца,0,122,134,102
+Condensed_Bold,Cyrillic lowercase,ца,-35,87,99,67
 Condensed_Bold,Cyrillic lowercase,це,0,117,117.0,97
 Condensed_Bold,Cyrillic lowercase,ци,0,83,117,63
 Condensed_Bold,Cyrillic lowercase,цо,0,117,117.0,97
@@ -5407,7 +5407,7 @@ Condensed_Bold_italic,Latin lowercase,ct,0,78,130.0,58
 Condensed_Bold_italic,Latin lowercase,da,0,127,176.0,107
 Condensed_Bold_italic,Latin lowercase,de,-60,95,95.0,75
 Condensed_Bold_italic,Latin lowercase,di,0,129,227.0,109
-Condensed_Bold_italic,Latin lowercase,do,0,155,155.0,135
+Condensed_Bold_italic,Latin lowercase,do,-60,95,95.0,75
 Condensed_Bold_italic,Latin lowercase,dr,0,160,227.0,140
 Condensed_Bold_italic,Latin lowercase,ea,0,71,151.0,51
 Condensed_Bold_italic,Latin lowercase,ec,0,76,162.0,56
@@ -5551,16 +5551,16 @@ Condensed_Bold_italic,Latin lowercase,tt,0,40,187.0,20
 Condensed_Bold_italic,Latin lowercase,tu,0,86,109.0,66
 Condensed_Bold_italic,Latin lowercase,tw,0,86,109.0,66
 Condensed_Bold_italic,Latin lowercase,ty,0,115,138.0,95
-Condensed_Bold_italic,Latin lowercase,ua,0,81,133.0,61
-Condensed_Bold_italic,Latin lowercase,ue,0,121,133.0,101
-Condensed_Bold_italic,Latin lowercase,ui,0,83,193.0,63
-Condensed_Bold_italic,Latin lowercase,ul,-90,91,103.0,71
-Condensed_Bold_italic,Latin lowercase,um,0,132,156.0,112
-Condensed_Bold_italic,Latin lowercase,un,0,132,156.0,112
-Condensed_Bold_italic,Latin lowercase,up,0,178,202.0,158
-Condensed_Bold_italic,Latin lowercase,ur,0,114,193.0,94
-Condensed_Bold_italic,Latin lowercase,us,0,111,179.0,91
-Condensed_Bold_italic,Latin lowercase,ut,0,40,162.0,20
+Condensed_Bold_italic,Latin lowercase,ua,0,105,154.0,85
+Condensed_Bold_italic,Latin lowercase,ue,0,133,133.0,113
+Condensed_Bold_italic,Latin lowercase,ui,0,107,205.0,87
+Condensed_Bold_italic,Latin lowercase,ul,-90,92,115.0,72
+Condensed_Bold_italic,Latin lowercase,um,0,156,156.0,136
+Condensed_Bold_italic,Latin lowercase,un,0,156,156.0,136
+Condensed_Bold_italic,Latin lowercase,up,-60,142,142.0,122
+Condensed_Bold_italic,Latin lowercase,ur,0,138,205.0,118
+Condensed_Bold_italic,Latin lowercase,us,0,123,179.0,103
+Condensed_Bold_italic,Latin lowercase,ut,0,64,162.0,44
 Condensed_Bold_italic,Latin lowercase,va,0,61,113.0,41
 Condensed_Bold_italic,Latin lowercase,ve,0,101,113.0,81
 Condensed_Bold_italic,Latin lowercase,vi,0,63,173.0,43
@@ -5997,7 +5997,7 @@ Condensed_Bold_italic,Latin corpus,lw,0,103,155.0,83
 Condensed_Bold_italic,Latin corpus,mu,0,86,86.0,66
 Condensed_Bold_italic,Latin corpus,nu,0,86,86.0,66
 Condensed_Bold_italic,Latin corpus,pó,0,86,86.0,66
-Condensed_Bold_italic,Latin corpus,yp,0,178,178.0,158
+Condensed_Bold_italic,Latin corpus,yp,-75,103,103.0,83
 Condensed_Bold_italic,Cyrillic corpus,АР,0,155,155.0,135
 Condensed_Bold_italic,Cyrillic corpus,АФ,0,63,161.0,43
 Condensed_Bold_italic,Cyrillic corpus,ВИ,0,155,155.0,135
