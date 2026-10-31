@@ -14,6 +14,13 @@ test('pack and test purchase entitlements remain distinct', () => {
   assert.deepEqual(purchasedFonts({ ...session, amount_total: 4000, metadata: { font_ids: 'full-pack' } }).map(item => item.id), ['full-pack'])
   assert.deepEqual(purchasedFonts({ ...session, amount_total: 100, metadata: { font_ids: 'test-font' } }).map(item => item.id), ['test-font'])
 })
+test('new and historical full pack orders retain their paid price', () => {
+  const order = { ...session, metadata: { font_ids: 'full-pack' } }
+  assert.equal(purchasedFonts({ ...order, amount_total: 6900 })[0].price, 69)
+  assert.equal(purchasedFonts({ ...order, amount_total: 4000 })[0].price, 40)
+  assert.throws(() => purchasedFonts({ ...order, amount_total: 6800 }))
+  assert.throws(() => purchasedFonts({ ...order, amount_total: 4000, currency: 'eur' }))
+})
 test('download links reject tampering, other orders, different secrets, and expiry', () => {
   const now = 1700000000000
   const token = createDownloadToken(session.id, 'test-signing-secret', now)

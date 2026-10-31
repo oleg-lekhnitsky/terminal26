@@ -20,10 +20,16 @@ export function purchasedFonts(session: PaidSession) {
     ...(ids?.includes('test-font') ? [{ id: 'test-font', label: 'Test font', price: 1 }] : []),
   ]
   if (!products.length) throw new Error('Order contains no font products.')
-  if (session.currency !== 'usd' || session.amount_total !== products.reduce((sum, product) => sum + product.price * 100, 0)) {
+  const total = products.reduce((sum, product) => sum + product.price * 100, 0)
+  // Existing paid Full pack orders retain their original $40 entitlement.
+  const legacyPack = products.some(product => product.id === 'full-pack')
+    && session.amount_total === total - 2900
+  if (session.currency !== 'usd' || (session.amount_total !== total && !legacyPack)) {
     throw new Error('Order amount does not match the font products.')
   }
-  return products
+  return legacyPack
+    ? products.map(product => product.id === 'full-pack' ? { ...product, price: 40 } : product)
+    : products
 }
 export function createDownloadToken(sessionId: string, secret: string, now = Date.now()) {
   const payload = Buffer.from(JSON.stringify({ id: sessionId, exp: Math.floor(now / 1000) + downloadLifetime })).toString('base64url')

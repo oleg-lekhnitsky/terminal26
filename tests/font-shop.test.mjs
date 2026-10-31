@@ -2,10 +2,10 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { addFontToCart, fontProducts, toggleFontSelection } from '../app/utils/fontShop.ts'
 
-test('each font style is $15 and the full pack is $40', () => {
+test('each font style is $15 and the full pack is $69', () => {
   assert.equal(fontProducts.length, 9)
   assert.ok(fontProducts.filter(item => item.id !== 'full-pack').every(item => item.price === 15))
-  assert.equal(fontProducts.find(item => item.id === 'full-pack').price, 40)
+  assert.equal(fontProducts.find(item => item.id === 'full-pack').price, 69)
 })
 test('cart avoids duplicate font licenses', () => {
   assert.deepEqual(addFontToCart(['regular'], 'regular'), ['regular'])

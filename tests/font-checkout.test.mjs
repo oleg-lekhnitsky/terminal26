@@ -16,7 +16,7 @@ test('checkout charges server prices and deduplicates styles', () => {
 })
 test('full pack replaces individual checkout items', () => {
   const params = checkoutParameters(['bold', 'full-pack', 'italic'], 'https://example.com')
-  assert.equal(params.get('line_items[0][price_data][unit_amount]'), '4000')
+  assert.equal(params.get('line_items[0][price_data][unit_amount]'), '6900')
   assert.equal(params.get('line_items[1][quantity]'), null)
   assert.equal(params.get('metadata[font_ids]'), 'full-pack')
 })
