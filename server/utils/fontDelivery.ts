@@ -8,10 +8,17 @@ export interface PaidSession {
   payment_status: string
   currency: string | null
   amount_total: number | null
+  amount_subtotal?: number | null
+  status?: string | null
+  total_details?: { amount_discount: number; amount_tax?: number; amount_shipping?: number } | null
   metadata?: { font_ids?: string } | null
 }
 export function purchasedFonts(session: PaidSession) {
-  if (session.mode !== 'payment' || session.payment_status !== 'paid') return []
+  if (session.mode !== 'payment' || (session.status && session.status !== 'complete')) return []
+  const paid = session.payment_status === 'paid'
+  const free = session.payment_status === 'no_payment_required'
+    && session.status === 'complete' && session.amount_total === 0
+  if (!paid && !free) return []
   const ids = session.metadata?.font_ids?.split(',')
   const currentIds = ids?.filter(id => id !== 'test-font')
   // Honor paid historical orders without making the retired test product purchasable.
@@ -20,11 +27,25 @@ export function purchasedFonts(session: PaidSession) {
     ...(ids?.includes('test-font') ? [{ id: 'test-font', label: 'Test font', price: 1 }] : []),
   ]
   if (!products.length) throw new Error('Order contains no font products.')
-  const total = products.reduce((sum, product) => sum + product.price * 100, 0)
-  // Existing paid Full pack orders retain their original $40 entitlement.
+  const catalogTotal = products.reduce((sum, product) => sum + product.price * 100, 0)
+  const hasSubtotal = session.amount_subtotal !== undefined && session.amount_subtotal !== null
+  const discount = session.total_details?.amount_discount ?? 0
+  // Select the historical price using the pre-discount subtotal, never the
+  // discounted total of a new $69 purchase.
+  const legacyTotal = catalogTotal - 2900
   const legacyPack = products.some(product => product.id === 'full-pack')
-    && session.amount_total === total - 2900
-  if (session.currency !== 'usd' || (session.amount_total !== total && !legacyPack)) {
+    && (hasSubtotal ? session.amount_subtotal === legacyTotal : session.amount_total === legacyTotal)
+  const expectedSubtotal = legacyPack ? legacyTotal : catalogTotal
+  const subtotal = hasSubtotal ? session.amount_subtotal! : expectedSubtotal
+  const tax = session.total_details?.amount_tax ?? 0
+  const shipping = session.total_details?.amount_shipping ?? 0
+  const cents = (value: unknown): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+  // These values must come from the server's authenticated Stripe retrieval.
+  // Current checkout offers no tax/shipping; a discount requires Stripe's subtotal.
+  if (session.currency !== 'usd' || !cents(subtotal) || subtotal !== expectedSubtotal
+    || !cents(discount) || discount > subtotal || (discount > 0 && !hasSubtotal)
+    || !cents(session.amount_total) || session.amount_total !== subtotal - discount
+    || tax !== 0 || shipping !== 0 || (free && discount !== subtotal)) {
     throw new Error('Order amount does not match the font products.')
   }
   return legacyPack

@@ -12,6 +12,7 @@ test('checkout charges server prices and deduplicates styles', () => {
   assert.equal(params.get('line_items[0][price_data][unit_amount]'), '1500')
   assert.equal(params.get('line_items[1][price_data][unit_amount]'), '1500')
   assert.equal(params.get('line_items[2][quantity]'), null)
+  assert.equal(params.get('allow_promotion_codes'), 'true')
   assert.equal(params.get('success_url'), 'https://example.com/checkout?session_id={CHECKOUT_SESSION_ID}')
 })
 test('full pack replaces individual checkout items', () => {

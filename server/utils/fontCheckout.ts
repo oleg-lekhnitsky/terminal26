@@ -12,6 +12,7 @@ export function checkoutParameters(input: unknown, origin: string) {
   const products = checkoutProducts(input)
   const params = new URLSearchParams({
     mode: 'payment',
+    allow_promotion_codes: 'true',
     success_url: `${origin}/checkout?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/?checkout=cancelled`,
     'metadata[font_ids]': products.map(product => product.id).join(','),

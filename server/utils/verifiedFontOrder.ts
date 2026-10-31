@@ -30,5 +30,5 @@ export async function verifiedFontOrder(event: H3Event) {
   let products
   try { products = purchasedFonts(session) }
   catch { throw createError({ statusCode: 409, statusMessage: 'The order does not match the font catalog.' }) }
-  return { id, products, paid: session.payment_status === 'paid' && products.length > 0, signingKey }
+  return { id, products, paid: products.length > 0, signingKey }
 }
