@@ -30,7 +30,7 @@ export interface MinskFlight {
   delayed: boolean
   cancelled: boolean
 }
-export interface MinskDepartures { flights: MinskFlight[]; updatedAt: string }
+export interface MinskDepartures { flights: MinskFlight[]; updatedAt: string; source?: 'airport' | 'avionio' }
 
 export function normalizeMinskFlights(input: unknown, now = Date.now()): MinskFlight[] {
   if (!Array.isArray(input)) throw new Error('Invalid airport feed')

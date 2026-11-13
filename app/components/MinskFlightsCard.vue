@@ -108,7 +108,7 @@ onBeforeUnmount(() => {
               </div>
               <div>
                 <p class="flights-pin__label">Gate</p>
-                <p>{{ flight.gate || 'Not assigned' }}</p>
+                <p>{{ flight.gate || (data?.source === 'avionio' ? 'Unavailable' : 'Not assigned') }}</p>
               </div>
             </footer>
           </article>
@@ -126,8 +126,8 @@ onBeforeUnmount(() => {
       </template>
     </div>
     <p v-if="error && data" class="flights-pin__notice" role="status">Update unavailable</p>
-    <figcaption><span>Departures</span><a href="https://airport.by/en/raspisanie-rejsov/vylety" target="_blank"
-        rel="noopener noreferrer">Minsk Airport ↗</a></figcaption>
+    <figcaption><span>Departures</span><a :href="data?.source === 'avionio' ? 'https://www.avionio.com/en/airport/msq/departures' : 'https://airport.by/en/raspisanie-rejsov/vylety'" target="_blank"
+        rel="noopener noreferrer">{{ data?.source === 'avionio' ? 'Avionio ↗' : 'Minsk Airport ↗' }}</a></figcaption>
   </figure>
 </template>
 
