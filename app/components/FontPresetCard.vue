@@ -9,16 +9,20 @@ const props = defineProps<{
   preset: typeof textPresets[number]
 }>()
 const dropWords = ['Латиница', 'Cyrillic']
+const posterPhrases = ['What\nThe\nfont', 'Rock\nor\nrap']
+const posterIndex = ref(0)
 const dropIndex = ref(0)
 const styleIndex = ref(0)
 const specimenFont = computed(() => props.preset.id === 'words' ? fontVariants[styleIndex.value]! : activeFont.value)
 const specimenText = computed(() => props.preset.id === 'letter'
   ? oneShotText(activeFont.value.id)
   : props.preset.id === 'words' ? specimenFont.value.label
-  : props.preset.id === 'drop' ? dropWords[dropIndex.value]! : props.preset.text)
+  : props.preset.id === 'drop' ? dropWords[dropIndex.value]!
+  : props.preset.id === 'poster' ? posterPhrases[posterIndex.value]! : props.preset.text)
 function advanceWord() {
   if (props.preset.id === 'drop') dropIndex.value = (dropIndex.value + 1) % dropWords.length
   if (props.preset.id === 'words') styleIndex.value = (styleIndex.value + 1) % fontVariants.length
+  if (props.preset.id === 'poster') posterIndex.value = (posterIndex.value + 1) % posterPhrases.length
 }
 </script>
 
