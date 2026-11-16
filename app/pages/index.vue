@@ -12,11 +12,11 @@ import type { Component } from 'vue'
 
 const siteUrl = useRuntimeConfig().public.siteUrl.replace(/\/$/, '')
 const pageTitle = 'AB Terminal — Typeface by Alex Blohin'
-const description = 'Explore eight styles, try your own text, and use AB Terminal in personal and commercial projects across desktop, web, and apps.'
+const description = 'AB Terminal is a typeface by Belarusian designer and art director Alex Blohin. Eight styles, with Latin and Cyrillic support, including Belarusian.'
 useSeoMeta({
   title: pageTitle,
   description,
-  author: 'Oleg Lekhnitsky',
+  author: 'Alex Blohin',
   ogTitle: pageTitle,
   ogDescription: description,
   ogType: 'website',
@@ -33,7 +33,22 @@ useSeoMeta({
   twitterImage: `${siteUrl}/og/ab-terminal.png`,
   twitterImageAlt: 'AB Terminal — typeface by Alex Blohin',
 }, { tagPriority: 15 })
-useHead({ link: [{ rel: 'canonical', href: `${siteUrl}/`, tagPriority: 15 }] })
+useHead({
+  link: [{ rel: 'canonical', href: `${siteUrl}/`, tagPriority: 15 }],
+  script: [{
+    key: 'site-identity',
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'AB Terminal',
+      alternateName: 'AB Terminal by Alex Blohin',
+      url: `${siteUrl}/`,
+      description,
+      creator: { '@type': 'Person', name: 'Alex Blohin', jobTitle: 'Designer and art director' },
+    }).replace(/</g, '\\u003c'),
+  }],
+})
 
 const { activeFont } = useFontSelection()
 const board = useTemplateRef('board')
@@ -109,11 +124,43 @@ onBeforeUnmount(() => {
     </div>
     <FullTypeTester class="home-page__section" />
     <BuyFontSection ref="buySection" class="home-page__section" />
+    <footer class="home-footer home-page__section">
+      <p class="home-footer__about">AB Terminal is a typeface by Belarusian designer and art director Alex Blohin. Eight styles, with Latin and Cyrillic support, including Belarusian. For headlines, posters, identities, and digital projects.</p>
+      <a href="mailto:hello@designdep.work">hello@designdep.work</a>
+    </footer>
   </main>
   <FontStyleSelector />
 </template>
 
 <style scoped lang="scss">
+.home-footer {
+  width: min(100%, 44rem);
+  padding: var(--space-6);
+  text-align: center;
+  font-family: var(--specimen-family, var(--font-sans));
+  font-weight: var(--specimen-weight, 400);
+  font-style: var(--specimen-style, normal);
+
+  &__about {
+    margin-bottom: 24px;
+    font-size: 16px;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--color-text);
+    font-family: var(--specimen-family, var(--font-sans));
+    font-weight: var(--specimen-weight, 400);
+    font-style: var(--specimen-style, normal);
+    font-size: 16px;
+    text-underline-offset: .2em;
+    text-decoration-thickness: 1px;
+
+    @media (hover: hover) { &:hover { text-decoration: none; } }
+  }
+}
+
 .home-hero {
   position: relative;
   width: 100%; min-width: 0;

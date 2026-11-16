@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      siteUrl: 'https://terminal26.vercel.app',
+      siteUrl: 'https://terminal.designdep.work',
     },
     stripeSecretKey: '',
     fontDownloadSecret: '',

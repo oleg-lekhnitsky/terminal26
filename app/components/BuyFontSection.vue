@@ -68,7 +68,7 @@ defineExpose({ openShop })
 <style scoped lang="scss">
 .buy-font {
   width: 100%; min-width: 0;
-  button { font-family: var(--font-sans); cursor: pointer; }
+  button { cursor: pointer; }
   svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   &__button {
     display: flex; align-items: center; justify-content: center; gap: 24px;
