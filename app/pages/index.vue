@@ -22,16 +22,16 @@ useSeoMeta({
   ogType: 'website',
   ogSiteName: 'AB Terminal',
   ogUrl: `${siteUrl}/`,
-  ogImage: `${siteUrl}/og/ab-terminal.png`,
+  ogImage: `${siteUrl}/og/ab-og.png`,
   ogImageWidth: 1200,
   ogImageHeight: 630,
   ogImageType: 'image/png',
-  ogImageAlt: 'AB Terminal in its bold typeface on black, with the credit typeface by Alex Blohin.',
+  ogImageAlt: 'Lowercase a and b in AB Terminal, shown in white on black.',
   twitterCard: 'summary_large_image',
   twitterTitle: pageTitle,
   twitterDescription: description,
-  twitterImage: `${siteUrl}/og/ab-terminal.png`,
-  twitterImageAlt: 'AB Terminal — typeface by Alex Blohin',
+  twitterImage: `${siteUrl}/og/ab-og.png`,
+  twitterImageAlt: 'Lowercase a and b in AB Terminal, shown in white on black.',
 }, { tagPriority: 15 })
 useHead({
   link: [{ rel: 'canonical', href: `${siteUrl}/`, tagPriority: 15 }],
@@ -126,7 +126,10 @@ onBeforeUnmount(() => {
     <BuyFontSection ref="buySection" class="home-page__section" />
     <footer class="home-footer home-page__section">
       <p class="home-footer__about">AB Terminal is a typeface by Belarusian designer and art director Alex Blohin. Eight styles, with Latin and Cyrillic support, including Belarusian. For headlines, posters, identities, and digital projects.</p>
-      <a href="mailto:hello@designdep.work">hello@designdep.work</a>
+      <div class="home-footer__links">
+        <a href="mailto:hello@designdep.work">hello@designdep.work</a>
+        <a href="https://www.linkedin.com/in/aleksei-blokhin-349b9a238/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
     </footer>
   </main>
   <FontStyleSelector />
@@ -146,6 +149,13 @@ onBeforeUnmount(() => {
     font-size: 16px;
     line-height: 1.5;
     text-wrap: pretty;
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 24px;
   }
 
   a {
