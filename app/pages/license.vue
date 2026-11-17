@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import licenseText from '../../public/AB-Terminal-License.txt?raw'
-useHead({ title: 'Font license · AB Terminal' })
+const siteUrl = useRuntimeConfig().public.siteUrl.replace(/\/$/, '')
+useHead({ title: 'Font license · AB Terminal', link: [{ rel: 'canonical', href: `${siteUrl}/license` }] })
 </script>
 
 <template>

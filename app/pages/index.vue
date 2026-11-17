@@ -8,11 +8,13 @@ import {
 } from '#components'
 import { textPresets } from '~/utils/textRenderer'
 import { galleryLayouts, galleryCardStyle, type GalleryCardId } from '~/utils/galleryLayout'
+import { fontProducts } from '~/utils/fontShop'
 import type { Component } from 'vue'
 
 const siteUrl = useRuntimeConfig().public.siteUrl.replace(/\/$/, '')
 const pageTitle = 'AB Terminal — Typeface by Alex Blohin'
 const description = 'AB Terminal is a typeface by Belarusian designer and art director Alex Blohin. Eight styles, with Latin and Cyrillic support, including Belarusian.'
+const fullFamily = fontProducts.find(product => product.id === 'full-pack')!
 useSeoMeta({
   title: pageTitle,
   description,
@@ -46,6 +48,26 @@ useHead({
       url: `${siteUrl}/`,
       description,
       creator: { '@type': 'Person', name: 'Alex Blohin', jobTitle: 'Designer and art director' },
+    }).replace(/</g, '\\u003c'),
+  }, {
+    key: 'font-product',
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      '@id': `${siteUrl}/#full-family`,
+      name: 'AB Terminal — Full family',
+      description: `${description} Full family includes all eight styles.`,
+      image: `${siteUrl}/og/ab-og.png`,
+      sku: 'ab-terminal-full-pack',
+      brand: { '@type': 'Brand', name: 'AB Terminal' },
+      offers: {
+        '@type': 'Offer',
+        url: `${siteUrl}/#buy-font`,
+        price: fullFamily.price,
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
     }).replace(/</g, '\\u003c'),
   }],
 })
@@ -122,14 +144,19 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-    <FullTypeTester class="home-page__section" />
-    <BuyFontSection ref="buySection" class="home-page__section" />
+    <FullTypeTester section-id="try-font" class="home-page__section" />
+    <BuyFontSection id="buy-font" ref="buySection" class="home-page__section" />
     <footer class="home-footer home-page__section">
       <p class="home-footer__about">AB Terminal is a typeface by Belarusian designer and art director Alex Blohin. Eight styles, with Latin and Cyrillic support, including Belarusian. For headlines, posters, identities, and digital projects.</p>
       <div class="home-footer__links">
         <a href="mailto:hello@designdep.work">hello@designdep.work</a>
         <a href="https://www.linkedin.com/in/aleksei-blokhin-349b9a238/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       </div>
+      <nav class="home-footer__links home-footer__navigation" aria-label="Typeface information">
+        <a href="#try-font">Try the typeface</a>
+        <a href="#buy-font">Buy AB Terminal</a>
+        <NuxtLink to="/license">Font license</NuxtLink>
+      </nav>
     </footer>
   </main>
   <FontStyleSelector />
@@ -157,6 +184,8 @@ onBeforeUnmount(() => {
     justify-content: center;
     gap: 12px 24px;
   }
+
+  &__navigation { margin-top: 24px; }
 
   a {
     color: var(--color-text);

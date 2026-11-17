@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const props = defineProps<{ sectionId?: string }>()
 const { activeFont } = useFontSelection()
 const id = useId()
 const editor = useTemplateRef('editor')
@@ -47,7 +48,7 @@ const appearance = computed(() => ({
 </script>
 
 <template>
-  <section :id="`${id}-tester`" class="type-tester" aria-label="Type tester">
+  <section :id="props.sectionId ?? `${id}-tester`" class="type-tester" aria-label="Type tester">
     <div class="type-tester__toolbar">
       <span class="type-tester__info">{{ activeFont.label }} · Latin &amp; Cyrillic</span>
       <button type="button" class="type-tester__settings-toggle"

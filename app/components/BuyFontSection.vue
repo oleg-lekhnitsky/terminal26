@@ -27,6 +27,7 @@ defineExpose({ openShop })
     <button class="buy-font__button" type="button" aria-haspopup="dialog" @click="openShop">
       <span>Buy AB Terminal</span>
     </button>
+    <p class="buy-font__summary">Individual styles ${{ options[0]!.price }} · Full family (8 styles) ${{ fullPack.price }} USD</p>
     <dialog ref="shop" class="buy-font__shop" :aria-labelledby="`${id}-title`" @click.self="shop?.close()">
       <div class="buy-font__inner">
         <button class="buy-font__close" type="button" aria-label="Close font shop" @click="shop?.close()">
@@ -69,6 +70,7 @@ defineExpose({ openShop })
 .buy-font {
   width: 100%; min-width: 0;
   button { cursor: pointer; }
+  &__summary { margin: 20px 0 0; text-align: center; font-size: 16px; line-height: 1.5; }
   svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   &__button {
     display: flex; align-items: center; justify-content: center; gap: 24px;
